@@ -6,31 +6,28 @@ const { start } = require("repl")
  */
 const get_results = function(body) {
 
-    var quiz_data = "{"
+    var reg_data = "{"
 
-    var quiz_elements = document.getElementById("quiz").elements
+    var reg_elements = document.getElementById("registration").elements
 
-    for (var i = 0; i < quiz_elements.length - 1; i++) {
+    for (var i = 0; i < reg_elements.length - 1; i++) {
         
-        if(quiz_elements[i].type === "radio" || quiz_elements[i].type === "checkbox"){
-            quiz_data = quiz_data + `"${quiz_elements[i].getAttribute("id")}":"${quiz_elements[i].checked}"`
-        
-        } else if(quiz_elements[i].type === "text"){
-            quiz_data = quiz_data + `"${quiz_elements[i].getAttribute("id")}":"${quiz_elements[i].value}"`
+        if(reg_elements[i].type === "text" || reg_elements[i].type === "email" || reg_elements[i].type === "tel" || reg_elements[i].type === "password"){
+            reg_data = reg_data + `"${reg_elements[i].getAttribute("id")}":"${reg_elements[i].value}"`
     
         }
         
        
-        if(i === quiz_elements.length - 2){ //The last question. The last element in the form will always be the submit button, hence -2.
-            quiz_data = quiz_data + "}"
+        if(i === reg_elements.length - 2){ //The last question. The last element in the form will always be the submit button, hence -2.
+            reg_data = reg_data + "}"
         } else {
-            quiz_data = quiz_data + ","
+            reg_data = reg_data + ","
         }
     }
 
-    var quiz_JSON = JSON.parse(quiz_data)
-    console.log(quiz_JSON)
-    return quiz_JSON
+    var reg_JSON = JSON.parse(reg_data)
+    console.log(reg_JSON)
+    return reg_JSON
 }
 
 
@@ -38,7 +35,7 @@ const get_results = function(body) {
 const get_json = function(body){
 
 
-    var quiz_string = JSON.stringify(body)
+    var reg_string = JSON.stringify(body)
     // console.log(quiz_string)
 
  
