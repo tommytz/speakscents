@@ -56,41 +56,81 @@ const connection = new Connection(config);
 // Attempt to connect and execute queries if connection goes through
 connection.on("connect", err => {
   if (err) {
+    console.log("error flag")
     console.error(err.message);
   } else {
       console.log("successful connection")
-    // queryDatabase();
+      //insertToDatabase();
+      queryFromDatabase();
   }
 });
 
 connection.connect();
+//insertToDatabase();
+//queryFromDatabase();
 
-function queryDatabase() {
-  console.log("Reading rows from the Table...");
+function insertToDatabase() {
+  console.log("Inserting into Table...");
 
-  // Read all rows from table
+  // Insert dummy data
   const request = new Request(
-    `SELECT TOP 20 pc.Name as CategoryName,
-                   p.name as ProductName
-     FROM [SalesLT].[ProductCategory] pc
-     JOIN [SalesLT].[Product] p ON pc.productcategoryid = p.productcategoryid`,
-    (err, rowCount) => {
+    `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_id, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) VALUES ('123', 'answer', 'cluster', '123e4567-e89b-12d3-a456-426614174000', '1', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6')`, (err) => {
+      if (err) {
+        console.log("Unable to insert data")
+        console.error(err.message);
+      } else {
+        console.log("Data inserted");
+      }
+    });
+  connection.execSql(request);
+}
+
+function queryFromDatabase() {
+  console.log("Reading from Table...");
+
+  // read all data
+  const request = new Request(
+    `SELECT * FROM quiz_results`, (err) => {
       if (err) {
         console.error(err.message);
       } else {
-        console.log(`${rowCount} row(s) returned`);
+        console.log("Successfully requested");
       }
-    }
-  );
-
-  request.on("row", columns => {
+    });
+      request.on("row", columns => {
     columns.forEach(column => {
       console.log("%s\t%s", column.metadata.colName, column.value);
     });
   });
-
-  connection.execSql(request);
+  console.log(connection.execSql(request));
 }
+
+// function queryDatabase() {
+//   console.log("Reading rows from the Table...");
+
+//   // Read all rows from table
+//   const request = new Request(
+//     `SELECT TOP 20 pc.Name as CategoryName,
+//                    p.name as ProductName
+//      FROM [SalesLT].[ProductCategory] pc
+//      JOIN [SalesLT].[Product] p ON pc.productcategoryid = p.productcategoryid`,
+//     (err, rowCount) => {
+//       if (err) {
+//         console.error(err.message);
+//       } else {
+//         console.log(`${rowCount} row(s) returned`);
+//       }
+//     }
+//   );
+
+//   request.on("row", columns => {
+//     columns.forEach(column => {
+//       console.log("%s\t%s", column.metadata.colName, column.value);
+//     });
+//   });
+
+//   connection.execSql(request);
+// }
 
 function consoleTest(){
   console.log("hello123")
