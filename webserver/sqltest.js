@@ -1,44 +1,44 @@
 // https://docs.microsoft.com/en-us/azure/azure-sql/database/connect-query-nodejs?tabs=windows
 
 const { Connection, Request, TYPES } = require("tedious");
-const username = "Morgan"
-const password = "TestDB0001928"
-const server_name = "speakscents-test-server.database.windows.net"
-const db_name = "test_database"
+const username = "Morgan";
+const password = "TestDB0001928";
+const server_name = "speakscents-test-server.database.windows.net";
+const db_name = "test_database";
 
-var trialJsonString = {"scent_suggestions":"asdfasdfasd","day_or_night":"day","season":"summer","gender":"masculine","moods":["classic","fresh"],"scent_styles":["woody","fruity","spicy"]}
+var trialJsonString = { "scent_suggestions": "asdfasdfasd", "day_or_night": "day", "season": "summer", "gender": "masculine", "moods": ["classic", "fresh"], "scent_styles": ["woody", "fruity", "spicy"] };
 
 // Create connection to database
 const config = {
   authentication: {
     options: {
       userName: username,
-      password: password     
+      password: password
     },
     type: "default"
   },
-  server: server_name, 
+  server: server_name,
   options: {
-    database: db_name, 
+    database: db_name,
     encrypt: true
   }
 };
 
 const connection = new Connection(config);
 
-const runQuery = function(JSON){
-  console.log("I'm tyrin gto connect")
+const runQuery = function (JSON) {
+  console.log("I'm tyrin gto connect");
   // Attempt to connect and execute queries if connection goes through
-    connection.on("connect", err => {
-      if (err) {
-        console.log("error flag")
-        console.error(err.message);
-      } else {
-          console.log("successful connection")
-          insertToDatabase(JSON);
-      }
-    });
-  }
+  connection.on("connect", err => {
+    if (err) {
+      console.log("error flag");
+      console.error(err.message);
+    } else {
+      console.log("successful connection");
+      insertToDatabase(JSON);
+    }
+  });
+};
 
 // function runQuery(JSON){
 // // Attempt to connect and execute queries if connection goes through
@@ -58,32 +58,37 @@ runQuery("{\"scent_suggestions\":\"asdfasdfasd\",\"day_or_night\":\"day\",\"seas
 //insertToDatabase();
 //queryFromDatabase();
 
-function insertToDatabase(unparsedJSON){
+function insertToDatabase(unparsedJSON) {
   console.log("Inserting into Table...");
   var parsedJSON = JSON.parse(unparsedJSON);
   var list = [];
-  for(data in parsedJSON){
+  for (data in parsedJSON) {
     list.push(data);
   }
   var q1 = list[0];
-  // var q2 = list[1];
-  // var q3 = list[2];
-  // var q4 = list[3];
-  // var q5 = list[4];
-  // var q6 = list[5];
+  var q2 = list[1];
+  var q3 = list[2];
+  var q4 = list[3];
+  var q5 = list[4];
+  var q6 = list[5];
 
   var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_id, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) `;
-  var values = `VALUES ('123', 'answer', 'cluster', '123e4567-e89b-12d3-a456-426614174000', '1', '@q1', 'q2', 'q3', 'q4', 'q5', 'q6')`;
+  var values = `VALUES ('123', 'answer', 'cluster', '123e4567-e89b-12d3-a456-426614174000', '1', @q1, @q2, @q3, @q4, @q5, @q6)`;
   const request = new Request(query + values
     , (err) => {
       if (err) {
-        console.log("Unable to insert data")
+        console.log("Unable to insert data");
         console.error(err.message);
       } else {
         console.log("Data inserted");
       }
     });
-    request.addParameter('q1', TYPES.VarChar, q1);
+  request.addParameter('q1', TYPES.VarChar, q1);
+  request.addParameter('q2', TYPES.VarChar, q2);
+  request.addParameter('q3', TYPES.VarChar, q3);
+  request.addParameter('q4', TYPES.VarChar, q4);
+  request.addParameter('q5', TYPES.VarChar, q5);
+  request.addParameter('q6', TYPES.VarChar, q6);
   connection.execSql(request);
 }
 
@@ -94,7 +99,7 @@ function insertDummyIntoDatabase() {
   const request = new Request(
     `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_id, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) VALUES ('123', 'answer', 'cluster', '123e4567-e89b-12d3-a456-426614174000', '1', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6')`, (err) => {
       if (err) {
-        console.log("Unable to insert data")
+        console.log("Unable to insert data");
         console.error(err.message);
       } else {
         console.log("Data inserted");
@@ -115,7 +120,7 @@ function queryFromDatabase() {
         console.log("Successfully requested");
       }
     });
-      request.on("row", columns => {
+  request.on("row", columns => {
     columns.forEach(column => {
       console.log("%s\t%s", column.metadata.colName, column.value);
     });
@@ -123,8 +128,8 @@ function queryFromDatabase() {
   console.log(connection.execSql(request));
 }
 
-function consoleTest(){
-  console.log("hello123")
+function consoleTest() {
+  console.log("hello123");
 }
 
-module.exports = {runQuery}
+module.exports = { runQuery };
