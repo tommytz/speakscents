@@ -35,7 +35,8 @@ const runQuery = function (JSON) {
       console.error(err.message);
     } else {
       console.log("successful connection");
-      insertToDatabase(JSON);
+      //insertToDatabase(JSON);
+      queryFromDatabase();
     }
   });
 };
@@ -63,17 +64,25 @@ function insertToDatabase(unparsedJSON) {
   var parsedJSON = JSON.parse(unparsedJSON);
   var list = [];
   for (data in parsedJSON) {
-    list.push(data);
+    let temp = parsedJSON[data]
+    if (temp instanceof Array) {
+      temp = JSON.stringify(temp)
+    }
+    list.push(temp);
   }
-  var q1 = list[0];
-  var q2 = list[1];
-  var q3 = list[2];
-  var q4 = list[3];
-  var q5 = list[4];
-  var q6 = list[5];
 
-  var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_id, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) `;
-  var values = `VALUES ('123', 'answer', 'cluster', '123e4567-e89b-12d3-a456-426614174000', '1', @q1, @q2, @q3, @q4, @q5, @q6)`;
+
+console.log(list)
+
+var q1 = list[0];
+var q2 = list[1];
+var q3 = list[2];
+var q4 = list[3];
+var q5 = list[4];
+var q6 = list[5];
+
+  var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) `;
+  var values = `VALUES ('123', 'answer', 'cluster', '1', @q1, @q2, @q3, @q4, @q5, @q6)`;
   const request = new Request(query + values
     , (err) => {
       if (err) {
@@ -92,44 +101,45 @@ function insertToDatabase(unparsedJSON) {
   connection.execSql(request);
 }
 
-function insertDummyIntoDatabase() {
-  console.log("Inserting into Table...");
+// function insertDummyIntoDatabase() {
+//   console.log("Inserting into Table...");
 
-  // Insert dummy data
-  const request = new Request(
-    `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_id, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) VALUES ('123', 'answer', 'cluster', '123e4567-e89b-12d3-a456-426614174000', '1', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6')`, (err) => {
-      if (err) {
-        console.log("Unable to insert data");
-        console.error(err.message);
-      } else {
-        console.log("Data inserted");
-      }
-    });
-  connection.execSql(request);
-}
+//   // Insert dummy data
+//   const request = new Request(
+//     `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_id, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) VALUES ('123', 'answer', 'cluster', '123e4567-e89b-12d3-a456-426614174000', '1', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6')`, (err) => {
+//       if (err) {
+//         console.log("Unable to insert data");
+//         console.error(err.message);
+//       } else {
+//         console.log("Data inserted");
+//       }
+//     });
+//   connection.execSql(request);
+// }
 
 function queryFromDatabase() {
   console.log("Reading from Table...");
+  let result_list = []
 
   // read all data
   const request = new Request(
-    `SELECT * FROM quiz_results`, (err) => {
+    `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM quiz_results ORDER BY quiz_results.quiz_id DESC`, (err) => {
       if (err) {
         console.error(err.message);
       } else {
         console.log("Successfully requested");
+        console.log(result_list);
       }
     });
   request.on("row", columns => {
     columns.forEach(column => {
-      console.log("%s\t%s", column.metadata.colName, column.value);
+      //console.log("%s\t%s", column.metadata.colName, column.value);
+      let temp = `${column.metadata.colName}: ${column.value}`
+      result_list.push(temp)
     });
   });
-  console.log(connection.execSql(request));
-}
-
-function consoleTest() {
-  console.log("hello123");
+  connection.execSql(request);
+  return result_list;
 }
 
 module.exports = { runQuery };

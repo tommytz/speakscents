@@ -1,6 +1,7 @@
 var express = require('express')
 var bodyParser = require('body-parser')
 var multer = require('multer')
+var sqltest = require('./sqltest')
 var upload = multer()
 var app = express()
 
@@ -37,7 +38,12 @@ app.get('/', function(req,res){
 //recieving quiz results
 app.post('/quiz-submit', function(req,res){
 
-    quiz.get_json(req.body)
+    var jsonString = quiz.get_json(req.body)
+    console.log("123====")
+    console.log(jsonString)
+    console.log("123====")
+    var sqlRun = sqltest.runQuery(jsonString)
+    console.log(sqlRun)
 
     res.send("Results Recieved")
 })

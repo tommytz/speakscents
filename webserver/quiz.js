@@ -30,6 +30,7 @@ const get_results = function(body) {
 
     var quiz_JSON = JSON.parse(quiz_data)
     console.log(quiz_JSON)
+    
     return quiz_JSON
 }
 
@@ -38,34 +39,37 @@ const get_results = function(body) {
 const get_json = function(body){
 
 
+
     var quiz_string = JSON.stringify(body)
-    // console.log(quiz_string)
+    console.log(quiz_string)
+    return quiz_string
+    // // console.log(quiz_string)
 
  
-    // this returns an array list
+    // // this returns an array list
+    // // var results = []
+
+    // // for(var key in body){
+    // //     results.push([key, body[key]])
+    // // }
+
+    // // console.log(results)
+    // // console.log(results.length)
+
+    // // if(results[0].includes('night')){
+    // //     console.log(true)
+    // // } else {
+    // //     console.log(false)
+    // // }
+
+    // // another style depending on how sql gets populated with quiz results
     // var results = []
 
     // for(var key in body){
-    //     results.push([key, body[key]])
+    //     results.push(body[key])
     // }
 
     // console.log(results)
-    // console.log(results.length)
-
-    // if(results[0].includes('night')){
-    //     console.log(true)
-    // } else {
-    //     console.log(false)
-    // }
-
-    // another style depending on how sql gets populated with quiz results
-    var results = []
-
-    for(var key in body){
-        results.push(body[key])
-    }
-
-    console.log(results)
 }
     
 
