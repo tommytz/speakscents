@@ -7,32 +7,36 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@200&display=swap');
         </style>
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.reg.css">
     <title>Registration</title>
 </head>
 
 <body>
-    <h1>Register below to start your fragrance journey</h1>
+    <h1 id="heading">Register below to start your fragrance journey</h1>
+    <div id="form">
+ 
     <form id="registration" method="post" action="registration-submit">
-        <ul>
-            <li>
+        <ul class="reg_form">
+            <li class="reg_list">
                 <label for="first_name_input">First Name: </label>
                 <input type="text" id="first_name" name="first_name" required>
             </li>
-            <li>
+            <li  class="reg_list">
                 <label for="last_name_input">Last Name: </label>
                 <input type="text" id="last_name" name="last_name" required>
             </li>
-            <li>
-                <label for="email">Enter your email: </label>
+            <li class="reg_list">
+                <label for="email">Email: </label>
 
                 <input type="email" id="email" name="email" required>
             </li>
-            <li>
+            <li class="reg_list">
                 <label for="telNo">Phone number:</label>
                 <input id="telNo" name="telNo" type="tel">
             </li>
-            <li>
+            <li class="reg_list">
                 <label for="userPassword">Password: </label>
                 <input id="userPassword" type="password" name="password" required>
                
@@ -40,6 +44,7 @@
         </ul>
         <button type="submit" id="submit_btn">Submit Form</button>
     </form>
+</div>
 <script type="text/javascript" src="registration.js"></script>
 </body>
 </html>
