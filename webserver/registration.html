@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@200&display=swap');
+        </style>
+    <link rel="stylesheet" href="/css/style.css">
     <title>Registration</title>
 </head>
+
 <body>
+    <h1>Register below to start your fragrance journey</h1>
     <form id="registration" method="post" action="registration-submit">
-        <ol>
+        <ul>
             <li>
                 <label for="first_name_input">First Name: </label>
                 <input type="text" id="first_name" name="first_name" required>
@@ -31,7 +37,7 @@
                 <input id="userPassword" type="password" name="password" required>
                
             </li>
-        </ol>
+        </ul>
         <button type="submit" id="submit_btn">Submit Form</button>
     </form>
 <script type="text/javascript" src="registration.js"></script>

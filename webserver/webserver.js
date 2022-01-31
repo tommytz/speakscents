@@ -4,6 +4,9 @@ var multer = require('multer')
 var upload = multer()
 var app = express()
 
+// app.use(express.static("speakscents"));
+app.use('/css',express.static(__dirname +'/css'));
+
 var quiz = require('./quiz.js')
 var reg = require('./registration.js')
 
