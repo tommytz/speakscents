@@ -1,10 +1,13 @@
 // https://docs.microsoft.com/en-us/azure/azure-sql/database/connect-query-nodejs?tabs=windows
 
+const { charset } = require("mime-types");
 const { Connection, Request, TYPES } = require("tedious");
 const username = "Morgan";
 const password = "TestDB0001928";
 const server_name = "speakscents-test-server.database.windows.net";
 const db_name = "test_database";
+var connection;
+
 
 var trialJsonString = { "scent_suggestions": "asdfasdfasd", "day_or_night": "day", "season": "summer", "gender": "masculine", "moods": ["classic", "fresh"], "scent_styles": ["woody", "fruity", "spicy"] };
 
@@ -20,60 +23,51 @@ const config = {
   server: server_name,
   options: {
     database: db_name,
-    encrypt: true
+    encrypt: true,
+    charset: 'utf8'
   }
 };
 
-const connection = new Connection(config);
+// const connection = new Connection(config)
 
-const runQuery = function (JSON) {
-  console.log("I'm tyrin gto connect");
-  // Attempt to connect and execute queries if connection goes through
+//Opens the connection to the server
+const connect2DB = function () {
+  connection = new Connection(config);
+
   connection.on("connect", err => {
     if (err) {
       console.log("error flag");
       console.error(err.message);
     } else {
       console.log("successful connection");
-      //insertToDatabase(JSON);
-      queryFromDatabase();
     }
   });
+
+  connection.connect();
 };
 
-// function runQuery(JSON){
-// // Attempt to connect and execute queries if connection goes through
-//   connection.on("connect", err => {
-//     if (err) {
-//       console.log("error flag")
-//       console.error(err.message);
-//     } else {
-//         console.log("successful connection")
-//         insertToDatabase(JSON);
-//     }
-//   });
-// }
 
-connection.connect();
-runQuery("{\"scent_suggestions\":\"asdfasdfasd\",\"day_or_night\":\"day\",\"season\":\"summer\",\"gender\":\"masculine\",\"moods\":[\"classic\",\"fresh\"],\"scent_styles\":[\"woody\",\"fruity\",\"spicy\"]}");
+// connection.connect();
+// runQuery("{\"scent_suggestions\":\"asdfasdfasd\",\"day_or_night\":\"day\",\"season\":\"summer\",\"gender\":\"masculine\",\"moods\":[\"classic\",\"fresh\"],\"scent_styles\":[\"woody\",\"fruity\",\"spicy\"]}");
 //insertToDatabase();
 //queryFromDatabase();
 
-function insertToDatabase(unparsedJSON) {
+//This uploads data from the webserver to the customer database
+const insertToDatabase = function (unparsedJSON) {
   console.log("Inserting into Table...");
-  var parsedJSON = JSON.parse(unparsedJSON);
+  // var parsedJSON = JSON.parse(unparsedJSON);
   var list = [];
-  for (data in parsedJSON) {
-    let temp = parsedJSON[data];
+  for (data in unparsedJSON) {
+    let temp = unparsedJSON[data];
     if (temp instanceof Array) {
       temp = JSON.stringify(temp);
     }
     list.push(temp);
   }
 
+  // console.log(list);
 
-  console.log(list);
-
+  //Saving json fields into list
   var q1 = list[0];
   var q2 = list[1];
   var q3 = list[2];
@@ -81,6 +75,9 @@ function insertToDatabase(unparsedJSON) {
   var q5 = list[4];
   var q6 = list[5];
 
+  console.log(q1);
+
+  //Actual query into db
   var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) `;
   var values = `VALUES ('123', 'answer', 'cluster', '1', @q1, @q2, @q3, @q4, @q5, @q6)`;
   const request = new Request(query + values
@@ -99,7 +96,7 @@ function insertToDatabase(unparsedJSON) {
   request.addParameter('q5', TYPES.VarChar, q5);
   request.addParameter('q6', TYPES.VarChar, q6);
   connection.execSql(request);
-}
+};
 
 // function insertDummyIntoDatabase() {
 //   console.log("Inserting into Table...");
@@ -117,7 +114,7 @@ function insertToDatabase(unparsedJSON) {
 //   connection.execSql(request);
 // }
 
-function queryFromDatabase() {
+let queryFromDatabase = function () {
   console.log("Reading from Table...");
   let result_list = [];
 
@@ -129,6 +126,7 @@ function queryFromDatabase() {
       } else {
         console.log("Successfully requested");
         console.log(result_list);
+        return JSON.stringify(result_list);
       }
     });
   request.on("row", columns => {
@@ -139,7 +137,6 @@ function queryFromDatabase() {
     });
   });
   connection.execSql(request);
-  return result_list;
-}
+};
 
-module.exports = { runQuery };
+module.exports = { connect2DB, insertToDatabase, queryFromDatabase };
