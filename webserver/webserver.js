@@ -12,6 +12,7 @@ app.use('/css',express.static(__dirname +'/css'));
 
 var quiz = require('./quiz.js')
 var reg = require('./registration.js')
+// var login = require('./login.js')
 
 const { allowedNodeEnvironmentFlags } = require('process')
 
@@ -60,6 +61,18 @@ app.get('/registration', function(req,res){
 app.post('/registration-submit', function(req,res){
 
     reg.get_json(req.body)
+    res.sendFile(__dirname + '/quiz.html')
+
+})
+
+//login page
+app.get('/login', function(req,res){
+    res.sendFile(__dirname + '/login.html')
+})
+
+app.post('/login-submit', function(req,res){
+
+    // login.get_json(req.body)
     res.sendFile(__dirname + '/quiz.html')
 
 })
