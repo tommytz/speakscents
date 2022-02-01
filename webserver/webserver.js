@@ -70,6 +70,18 @@ app.post('/registration-submit', function (req, res) {
 
 });
 
+//login page
+app.get('/login', function(req,res){
+    res.sendFile(__dirname + '/login.html')
+})
+
+app.post('/login-submit', function(req,res){
+
+    // login.get_json(req.body)
+    res.sendFile(__dirname + '/quiz.html')
+
+})
+
 //This function returns the saved results from the DB and presents it back to the user
 app.get('/quiz-results', function (req, res) {
 
