@@ -6,7 +6,7 @@ const username = "Morgan";
 const password = "TestDB0001928";
 const server_name = "speakscents-test-server.database.windows.net";
 const db_name = "test_database";
-var connection
+var connection;
 
 
 var trialJsonString = { "scent_suggestions": "asdfasdfasd", "day_or_night": "day", "season": "summer", "gender": "masculine", "moods": ["classic", "fresh"], "scent_styles": ["woody", "fruity", "spicy"] };
@@ -31,10 +31,10 @@ const config = {
 // const connection = new Connection(config)
 
 //Opens the connection to the server
-const connect2DB = function(){
- connection = new Connection(config)
- 
- connection.on("connect", err => {
+const connect2DB = function () {
+  connection = new Connection(config);
+
+  connection.on("connect", err => {
     if (err) {
       console.log("error flag");
       console.error(err.message);
@@ -43,8 +43,8 @@ const connect2DB = function(){
     }
   });
 
-  connection.connect()
-}
+  connection.connect();
+};
 
 
 // connection.connect();
@@ -54,15 +54,15 @@ const connect2DB = function(){
 
 //This uploads data from the webserver to the customer database
 const insertToDatabase = function (unparsedJSON) {
-    console.log("Inserting into Table...");
-    // var parsedJSON = JSON.parse(unparsedJSON);
-    var list = [];
-    for (data in unparsedJSON) {
-      let temp = unparsedJSON[data];
-      if (temp instanceof Array) {
-        temp = JSON.stringify(temp);
-      }
-      list.push(temp);
+  console.log("Inserting into Table...");
+  // var parsedJSON = JSON.parse(unparsedJSON);
+  var list = [];
+  for (data in unparsedJSON) {
+    let temp = unparsedJSON[data];
+    if (temp instanceof Array) {
+      temp = JSON.stringify(temp);
+    }
+    list.push(temp);
   }
 
   // console.log(list);
@@ -75,7 +75,7 @@ const insertToDatabase = function (unparsedJSON) {
   var q5 = list[4];
   var q6 = list[5];
 
-  console.log(q1)
+  console.log(q1);
 
   //Actual query into db
   var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) `;
@@ -96,7 +96,7 @@ const insertToDatabase = function (unparsedJSON) {
   request.addParameter('q5', TYPES.VarChar, q5);
   request.addParameter('q6', TYPES.VarChar, q6);
   connection.execSql(request);
-}
+};
 
 // function insertDummyIntoDatabase() {
 //   console.log("Inserting into Table...");
@@ -114,7 +114,7 @@ const insertToDatabase = function (unparsedJSON) {
 //   connection.execSql(request);
 // }
 
-function queryFromDatabase() {
+let queryFromDatabase = function () {
   console.log("Reading from Table...");
   let result_list = [];
 
@@ -126,6 +126,7 @@ function queryFromDatabase() {
       } else {
         console.log("Successfully requested");
         console.log(result_list);
+        return JSON.stringify(result_list);
       }
     });
   request.on("row", columns => {
@@ -136,7 +137,6 @@ function queryFromDatabase() {
     });
   });
   connection.execSql(request);
-  return result_list;
-}
+};
 
-module.exports = { connect2DB, insertToDatabase };
+module.exports = { connect2DB, insertToDatabase, queryFromDatabase };

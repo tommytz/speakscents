@@ -52,7 +52,7 @@ app.post('/quiz-submit', function (req, res) {
   console.log("1");
   sqltest.insertToDatabase(jsonString);
   console.log("2");
- 
+
 
   // res.send("Results Recieved")
   res.sendFile(__dirname + '/quiz_results.html');
@@ -74,7 +74,9 @@ app.post('/registration-submit', function (req, res) {
 app.get('/quiz-results', function (req, res) {
 
   //Data from sql
-  var data = "abcdefghijklmenop";
+  var data = sqltest.queryFromDatabase();
+  console.log(typeof data);
+  console.log("From the function call: " + data);
 
   // let html = ejs.render('<%= people.join(", "); %>', {people: people});
 
