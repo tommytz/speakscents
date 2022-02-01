@@ -64,22 +64,22 @@ function insertToDatabase(unparsedJSON) {
   var parsedJSON = JSON.parse(unparsedJSON);
   var list = [];
   for (data in parsedJSON) {
-    let temp = parsedJSON[data]
+    let temp = parsedJSON[data];
     if (temp instanceof Array) {
-      temp = JSON.stringify(temp)
+      temp = JSON.stringify(temp);
     }
     list.push(temp);
   }
 
 
-console.log(list)
+  console.log(list);
 
-var q1 = list[0];
-var q2 = list[1];
-var q3 = list[2];
-var q4 = list[3];
-var q5 = list[4];
-var q6 = list[5];
+  var q1 = list[0];
+  var q2 = list[1];
+  var q3 = list[2];
+  var q4 = list[3];
+  var q5 = list[4];
+  var q6 = list[5];
 
   var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) `;
   var values = `VALUES ('123', 'answer', 'cluster', '1', @q1, @q2, @q3, @q4, @q5, @q6)`;
@@ -119,7 +119,7 @@ var q6 = list[5];
 
 function queryFromDatabase() {
   console.log("Reading from Table...");
-  let result_list = []
+  let result_list = [];
 
   // read all data
   const request = new Request(
@@ -134,8 +134,8 @@ function queryFromDatabase() {
   request.on("row", columns => {
     columns.forEach(column => {
       //console.log("%s\t%s", column.metadata.colName, column.value);
-      let temp = `${column.metadata.colName}: ${column.value}`
-      result_list.push(temp)
+      let temp = `${column.metadata.colName}: ${column.value}`;
+      result_list.push(temp);
     });
   });
   connection.execSql(request);

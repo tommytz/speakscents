@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+</head>
+<body>
+    <form id="registration" method="post" action="registration-submit">
+        <ol>
+            <li>
+                <label for="first_name_input">First Name: </label>
+                <input type="text" id="first_name" required>
+            </li>
+            <li>
+                <label for="second_name_input">Second Name: </label>
+                <input type="text" id="second_name" required>
+            </li>
+            <li>
+                <label for="email">Enter your email: </label>
+
+                <input type="email" id="email" required>
+            </li>
+            <li>
+                <label for="telNo">Phone number:</label>
+                <input id="telNo" name="telNo" type="tel">
+            </li>
+            <li>
+                <label for="userPassword">Password: </label>
+                <input id="userPassword" type="password" required>
+               
+            </li>
+        </ol>
+        <button type="submit" id="submit_btn">Submit Form</button>
+    </form>
+<script type="text/javascript" src="registration.js"></script>
+</body>
+</html>
