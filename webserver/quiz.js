@@ -50,7 +50,7 @@ const get_results = function (body) {
 //
 const get_json = function (body) {
 
-  return body
+  return body;
 };
 
 
@@ -60,14 +60,15 @@ const get_json = function (body) {
 //
 const get_jsonAsList = function (body) {
 
-  var results = []
+  var results = [];
 
   for(var key in body){
-      results.push([key, body[key]])
+
+      results.push([key, body[key]]);
   }
 
 
-  return results
+  return results;
 };
 
 //
@@ -75,13 +76,14 @@ const get_jsonAsList = function (body) {
 //
 const get_jsonAsListOfValues = function (body) {
 
-  var results = []
+  var results = [];
   
   for(var key in body){
-      results.push(body[key])
+
+      results.push(body[key]);
   }
 
-  return results
+  return results;
 };
 
 
