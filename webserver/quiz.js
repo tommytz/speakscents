@@ -40,10 +40,9 @@ const get_results = function (body) {
 const get_json = function (body) {
 
 
-
-  var quiz_string = JSON.stringify(body);
-  console.log(quiz_string);
-  return quiz_string;
+  // var quiz_string = JSON.stringify(body);
+  // console.log(quiz_string);
+  // return quiz_string;
   // // console.log(quiz_string)
 
 
@@ -71,6 +70,8 @@ const get_json = function (body) {
   // }
 
   // console.log(results)
+
+  return body
 };
 
 module.exports = { get_json };

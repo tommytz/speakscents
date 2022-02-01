@@ -14,9 +14,6 @@ var quiz = require('./quiz.js');
 var reg = require('./registration.js');
 
 const { allowedNodeEnvironmentFlags } = require('process');
-
-
-
 var port = 8080;
 
 //for parsing json, multiforms
@@ -25,7 +22,6 @@ app.use(bodyParser.json());
 app.use(upload.array());
 app.use(express.static('public'));
 app.use(flash());
-
 
 //Changing the engine to ejs, so we can view/embed data in particular way, that can we can then manipulate in express
 //This replaces serving a html file, instead of send file, we use render.
@@ -36,6 +32,8 @@ app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
 
+//Opening connection to customer db
+sqltest.connect2DB();
 
 //Responding to requests
 // app.get('route', fn(req,res)) route url address. , fn being what action to fire when it does
@@ -51,11 +49,10 @@ app.get('/', function (req, res) {
 app.post('/quiz-submit', function (req, res) {
 
   var jsonString = quiz.get_json(req.body);
-  console.log("123====");
-  console.log(jsonString);
-  console.log("123====");
-  var sqlRun = sqltest.runQuery(jsonString);
-  console.log(sqlRun);
+  console.log("1");
+  sqltest.insertToDatabase(jsonString);
+  console.log("2");
+ 
 
   // res.send("Results Recieved")
   res.sendFile(__dirname + '/quiz_results.html');
@@ -97,10 +94,6 @@ app.get('/quiz-results', function (req, res) {
     scentMood: scentMood,
     scentStyles: scentStyles
   });
-
-
-
-
 
 
 });
