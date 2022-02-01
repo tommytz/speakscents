@@ -17,7 +17,7 @@ var upload = multer();
 var app = express();
 
 //Local modules required
-var quiz = require('./quiz.js');
+var form = require('./form-reader.js');
 var reg = require('./registration.js');
 
 //Server details
@@ -58,7 +58,7 @@ app.get("/", function (req, res) {
 //This request gets form data from the quiz and stores data in the database
 app.post("/quiz-submit", function (req, res) {
 
-  var jsonObject = quiz.get_json(req.body);
+  var jsonObject = form.get_json(req.body);
   
   sqltest.insertToDatabase(jsonObject);
   
