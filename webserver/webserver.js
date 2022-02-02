@@ -57,7 +57,7 @@ app.post('/quiz-submit', function (req, res) {
   var sqlRun = sqltest.runQuery(jsonString);
   console.log(sqlRun);
 
-  // res.send("Results Recieved")
+  //send to quiz results page
   res.sendFile(__dirname + '/quiz_results.html');
 });
 
@@ -66,6 +66,7 @@ app.get('/registration', function (req, res) {
   res.sendFile(__dirname + '/registration.html');
 });
 
+//registration submit
 app.post('/registration-submit', function (req, res) {
 
   reg.get_json(req.body);
@@ -78,6 +79,8 @@ app.get('/login', function(req,res){
     res.sendFile(__dirname + '/login.html')
 })
 
+//login details submit
+//TODO don't yet have login verification
 app.post('/login-submit', function(req,res){
 
     // login.get_json(req.body)
@@ -91,7 +94,7 @@ app.get('/quiz-results', function (req, res) {
   //Data from sql
   var data = "abcdefghijklmenop";
 
-  // let html = ejs.render('<%= people.join(", "); %>', {people: people});
+  let html = ejs.render('<%= people.join(", "); %>', {people: people});
 
   var suggestions = "hellow";
   var time = "mate";

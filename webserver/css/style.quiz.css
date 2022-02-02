@@ -1,0 +1,23 @@
+/* settings for the quiz.html file */
+
+/* quiz form bordeer settings */
+.quiz_list {
+    border: 2px solid rgb(255, 135, 23);
+    padding: 10px;
+    border-radius: 25px;
+    margin: 10px;
+
+}
+#form {
+
+    margin: auto;
+    width: fit-content;
+
+}
+
+#heading {
+    background-color: rgb(255, 135, 23);
+
+    width: 100%;
+    text-align: center;
+}
