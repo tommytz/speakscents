@@ -1,71 +1,83 @@
+/*
+ * This module's primary purpose is to process API calls from webengine to database.
+ * This module controls the following:
+ * - Opening server
+ * - Open connection to database
+ * - Process http post/get requests
+ */
+
+// Dependencies and required internal node.js modules
 var express = require('express');
 var bodyParser = require('body-parser');
 var multer = require('multer');
 var sqltest = require('./sqltest');
+var flash = require('connect-flash');
+var ejs = require('ejs');
 var upload = multer();
 var app = express();
 
-var flash = require('connect-flash');
-var ejs = require('ejs');
-
-// app.use(express.static("speakscents"));
-app.use('/css', express.static(__dirname + '/css'));
-var quiz = require('./quiz.js');
+//Local modules required
+var form = require('./form-reader.js');
 var reg = require('./registration.js');
 
+//Server details
 const { allowedNodeEnvironmentFlags } = require('process');
 var port = 8080;
 
-//for parsing json, multiforms
+//Setting node.js for parsing json, multibox forms, css styling
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(upload.array());
 app.use(express.static('public'));
 app.use(flash());
+app.use('/css', express.static(__dirname + '/css'));
 
 //Changing the engine to ejs, so we can view/embed data in particular way, that can we can then manipulate in express
-//This replaces serving a html file, instead of send file, we use render.
+//This replaces serving a html file, instead of send file, we use render. Please don't edit, thanks AL
 app.set('view engine', 'ejs');
 
-//Server created and listening on port number
+//Server creation and listening on port number. This is called automatically when this module is initialised
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
 
-//Opening connection to customer db
+//Opening connection to database
 sqltest.connect2DB();
 
-//Responding to requests
-// app.get('route', fn(req,res)) route url address. , fn being what action to fire when it does
+/* *************************************************************************
+ * Processing requests from webengine
+ * *************************************************************************/
 
+//Landing page when a client access the server
+app.get("/", function (req, res) {
 
-//Home page
-app.get('/', function (req, res) {
-
-  res.sendFile(__dirname + '/quiz.html');
+  var fileName = "/quiz.html";
+  res.sendFile(__dirname + fileName);
 });
 
-//recieving quiz results
-app.post('/quiz-submit', function (req, res) {
+//This request gets form data from the quiz and stores data in the database
+app.post("/quiz-submit", function (req, res) {
 
-  var jsonString = quiz.get_json(req.body);
-  console.log("1");
-  sqltest.insertToDatabase(jsonString);
-  console.log("2");
+  var jsonObject = form.get_json(req.body);
+  
+  sqltest.insertToDatabase(jsonObject);
+  
+  //Responds client to submission page
+  res.sendFile(__dirname + "/quiz_results.html");
 
-
-  // res.send("Results Recieved")
-  res.sendFile(__dirname + '/quiz_results.html');
 });
 
-//registration page
+//Registration page
 app.get('/registration', function (req, res) {
   res.sendFile(__dirname + '/registration.html');
 });
 
+//Submit registered data and returns them to the quiz.html page
 app.post('/registration-submit', function (req, res) {
 
   reg.get_json(req.body);
+
+  //code for database injection goes here
   res.sendFile(__dirname + '/quiz.html');
 
 });
@@ -83,6 +95,7 @@ app.post('/login-submit', function(req,res){
 })
 
 //This function returns the saved results from the DB and presents it back to the user
+// WORK IN PROGRESS 02/02/2022 11:39am
 app.get('/quiz-results', function (req, res) {
 
   //Data from sql
