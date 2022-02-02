@@ -99,9 +99,13 @@ app.post('/login-submit', function (req, res) {
 app.get('/quiz-results', function (req, res) {
 
   //Data from sql
-  var data = sql_api.queryFromDatabase();
-  console.log(typeof data);
-  console.log("From the function call: " + data);
+  var data = sql_api.readLastEntry();
+  // console.log(data + "^.^");
+
+
+  // console.log(data);
+  // console.log("+++++++++++++")
+
 
   // let html = ejs.render('<%= people.join(", "); %>', {people: people});
 

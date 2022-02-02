@@ -1,7 +1,10 @@
 // https://docs.microsoft.com/en-us/azure/azure-sql/database/connect-query-nodejs?tabs=windows
 
+const { reject } = require("lodash");
 const { charset } = require("mime-types");
+const { resolve } = require("path/posix");
 const { Connection, Request, TYPES } = require("tedious");
+const { callbackify } = require("util");
 const username = "Morgan";
 const password = "TestDB0001928";
 const server_name = "speakscents-test-server.database.windows.net";
@@ -31,7 +34,7 @@ const connect2DB = function () {
 
   connection.on("connect", err => {
     if (err) {
-      console.log("error flag");
+   
       console.error(err.message);
     } else {
       console.log("successful connection");
@@ -94,21 +97,22 @@ const insertToDatabase = function (unparsedJSON) {
 };
 
 // Retrieves final row from customer DB (sorted descending by quiz_id) and returns quiz answers to webserver caller
-let queryFromDatabase = function () {
-  console.log("Reading from Table...");
+const queryFromDatabase = function () {
+  let queryString = `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM quiz_results ORDER BY quiz_results.quiz_id DESC`
   let result_list = [];
 
   // read all data
-  const request = new Request(
-    `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM quiz_results ORDER BY quiz_results.quiz_id DESC`, (err) => {
+  const request = new Request( queryString  , (err) => {
       if (err) {
         console.error(err.message);
       } else {
         console.log("Successfully requested");
-        console.log(result_list);
-        return JSON.stringify(result_list);
+        // console.log(result_list);
       }
     });
+  
+  request.on('prepared', function () { });
+
   request.on("row", columns => {
     columns.forEach(column => {
       //console.log("%s\t%s", column.metadata.colName, column.value);
@@ -116,7 +120,68 @@ let queryFromDatabase = function () {
       result_list.push(temp);
     });
   });
+
   connection.execSql(request);
+
+ 
 };
 
-module.exports = { connect2DB, insertToDatabase, queryFromDatabase };
+
+//reads last row of data from the quiz data table
+const readDB = function () {
+
+    let queryString = `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM quiz_results ORDER BY quiz_results.quiz_id DESC`
+    
+}
+
+function readLastEntry() {
+
+  let testPromise = new Promise((resolve, reject) => {
+
+    var result = [];
+    let sql = `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM quiz_results ORDER BY quiz_results.quiz_id DESC`
+
+    const request = new Request(sql, (err) => {
+      if (err){
+
+        reject();
+      } else {
+      
+        resolve(result);
+      }
+    });
+
+    request.on("row", function(columns) { //on the returned row(s)
+      columns.forEach(function(column) { //for each of the columns in the row(s)
+        // console.log(`${column.metadata.colName}: ${column.value}`); //Print the columnname : value
+        let temp = `${column.metadata.colName}: ${column.value}`;
+        result.push(temp);
+      });
+    });
+
+    connection.execSql(request);
+
+  });
+
+  testPromise.then((result) => {
+    
+    
+    // console.log("success in then");
+    console.log(result);
+   
+
+  }).catch((err) => {
+    console.log( err + "error in catch")
+  });
+
+  console.log(testPromise);
+  return testPromise;
+
+}
+
+
+
+
+
+
+module.exports = { connect2DB, insertToDatabase, readLastEntry };
