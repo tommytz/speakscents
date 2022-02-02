@@ -66,7 +66,7 @@ const insertToDatabase = function (unparsedJSON) {
 
   // console.log(q1);
 
-  // Constructing the request for the insert query
+  // Constructing the request for the insert query ADD LOOP FOR QUESTON NUMBERS IN SQL QUERY STRING (e.g. add q${i} to empty string)
   var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) `;
   var values = `VALUES ('123', 'answer', 'cluster', '1', @q1, @q2, @q3, @q4, @q5, @q6)`;
   const request = new Request(query + values
