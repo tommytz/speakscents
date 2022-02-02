@@ -8,10 +8,7 @@ const server_name = "speakscents-test-server.database.windows.net";
 const db_name = "test_database";
 var connection;
 
-
-var trialJsonString = { "scent_suggestions": "asdfasdfasd", "day_or_night": "day", "season": "summer", "gender": "masculine", "moods": ["classic", "fresh"], "scent_styles": ["woody", "fruity", "spicy"] };
-
-// Create connection to database
+// Config required for database connection
 const config = {
   authentication: {
     options: {
@@ -27,8 +24,6 @@ const config = {
     charset: 'utf8'
   }
 };
-
-// const connection = new Connection(config)
 
 //Opens the connection to the server
 const connect2DB = function () {
@@ -46,38 +41,32 @@ const connect2DB = function () {
   connection.connect();
 };
 
-
-// connection.connect();
-// runQuery("{\"scent_suggestions\":\"asdfasdfasd\",\"day_or_night\":\"day\",\"season\":\"summer\",\"gender\":\"masculine\",\"moods\":[\"classic\",\"fresh\"],\"scent_styles\":[\"woody\",\"fruity\",\"spicy\"]}");
-//insertToDatabase();
-//queryFromDatabase();
-
 //This uploads data from the webserver to the customer database
 const insertToDatabase = function (unparsedJSON) {
   console.log("Inserting into Table...");
   // var parsedJSON = JSON.parse(unparsedJSON);
-  var list = [];
+  var answer_array = [];
   for (data in unparsedJSON) {
     let temp = unparsedJSON[data];
     if (temp instanceof Array) {
       temp = JSON.stringify(temp);
     }
-    list.push(temp);
+    answer_array.push(temp);
   }
 
-  // console.log(list);
+  console.log(answer_array);
 
   //Saving json fields into list
-  var q1 = list[0];
-  var q2 = list[1];
-  var q3 = list[2];
-  var q4 = list[3];
-  var q5 = list[4];
-  var q6 = list[5];
+  // var q1 = answer_array[0];
+  // var q2 = answer_array[1];
+  // var q3 = answer_array[2];
+  // var q4 = answer_array[3];
+  // var q5 = answer_array[4];
+  // var q6 = answer_array[5];
 
-  console.log(q1);
+  // console.log(q1);
 
-  //Actual query into db
+  // Constructing the request for the insert query
   var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) `;
   var values = `VALUES ('123', 'answer', 'cluster', '1', @q1, @q2, @q3, @q4, @q5, @q6)`;
   const request = new Request(query + values
@@ -89,31 +78,22 @@ const insertToDatabase = function (unparsedJSON) {
         console.log("Data inserted");
       }
     });
-  request.addParameter('q1', TYPES.VarChar, q1);
-  request.addParameter('q2', TYPES.VarChar, q2);
-  request.addParameter('q3', TYPES.VarChar, q3);
-  request.addParameter('q4', TYPES.VarChar, q4);
-  request.addParameter('q5', TYPES.VarChar, q5);
-  request.addParameter('q6', TYPES.VarChar, q6);
-  connection.execSql(request);
+  // request.addParameter('q1', TYPES.VarChar, q1);
+  // request.addParameter('q2', TYPES.VarChar, q2);
+  // request.addParameter('q3', TYPES.VarChar, q3);
+  // request.addParameter('q4', TYPES.VarChar, q4);
+  // request.addParameter('q5', TYPES.VarChar, q5);
+  // request.addParameter('q6', TYPES.VarChar, q6);
+  for (let i = 0; i < 6; i++) {
+    let qi = answer_array[i];
+    console.log("i: " + i + ", answer " + (i + 1) + ": " + qi + " ==> " + `q${i + 1}`);
+    request.addParameter(`q${i + 1}`, TYPES.VarChar, qi);
+  }
+  console.log("Done: " + answer_array.length);
+  // connection.execSql(request);
 };
 
-// function insertDummyIntoDatabase() {
-//   console.log("Inserting into Table...");
-
-//   // Insert dummy data
-//   const request = new Request(
-//     `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_id, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) VALUES ('123', 'answer', 'cluster', '123e4567-e89b-12d3-a456-426614174000', '1', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6')`, (err) => {
-//       if (err) {
-//         console.log("Unable to insert data");
-//         console.error(err.message);
-//       } else {
-//         console.log("Data inserted");
-//       }
-//     });
-//   connection.execSql(request);
-// }
-
+// Retrieves final row from customer DB (sorted descending by quiz_id) and returns quiz answers to webserver caller
 let queryFromDatabase = function () {
   console.log("Reading from Table...");
   let result_list = [];
