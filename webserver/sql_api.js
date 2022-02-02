@@ -1,4 +1,13 @@
-// https://docs.microsoft.com/en-us/azure/azure-sql/database/connect-query-nodejs?tabs=windows
+/* This module is responsible for querying the database.
+ * This module handles the following:
+ * - Connection configuration
+ * - Execute SQL request (CRUD functions)
+ * 
+ * Configuration details: // https://docs.microsoft.com/en-us/azure/azure-sql/database/connect-query-nodejs?tabs=windows
+ * ============================================================================================
+ *  No validation of data should happen here. Should be done serverside in the form-reader.js
+ * ============================================================================================
+ */
 
 const { charset } = require("mime-types");
 const { Connection, Request, TYPES } = require("tedious");

@@ -6,11 +6,10 @@
  * - Process http post/get requests
  */
 
-// Dependencies and required internal node.js modules
+//Dependencies and required internal node.js modules
 var express = require('express');
 var bodyParser = require('body-parser');
 var multer = require('multer');
-var sql_api = require('./sql_api');
 var flash = require('connect-flash');
 var ejs = require('ejs');
 var upload = multer();
@@ -18,6 +17,7 @@ var app = express();
 
 //Local modules required
 var form = require('./form-reader.js');
+var sql_api = require('./sql_api');
 
 //Server details
 const { allowedNodeEnvironmentFlags } = require('process');
