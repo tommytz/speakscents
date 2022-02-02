@@ -75,7 +75,9 @@ app.get('/registration', function (req, res) {
 //Submit registered data and returns them to the quiz.html page
 app.post('/registration-submit', function (req, res) {
 
-  form.get_json(req.body);
+  var jsonObject = form.get_json(req.body);
+
+  sql_api.insertToDatabaseRegistration(jsonObject);
 
   //code for database injection goes here
   res.sendFile(__dirname + '/quiz.html');
