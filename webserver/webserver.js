@@ -10,7 +10,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var multer = require('multer');
-var sqltest = require('./sqltest');
+var sql_api = require('./sql_api');
 var flash = require('connect-flash');
 var ejs = require('ejs');
 var upload = multer();
@@ -42,7 +42,7 @@ app.listen(port, () => {
 });
 
 //Opening connection to database
-sqltest.connect2DB();
+sql_api.connect2DB();
 
 /* *************************************************************************
  * Processing requests from webengine
@@ -59,9 +59,9 @@ app.get("/", function (req, res) {
 app.post("/quiz-submit", function (req, res) {
 
   var jsonObject = form.get_json(req.body);
-  
-  sqltest.insertToDatabase(jsonObject);
-  
+
+  sql_api.insertToDatabase(jsonObject);
+
   //Responds client to submission page
   res.sendFile(__dirname + "/quiz_results.html");
 
@@ -83,23 +83,23 @@ app.post('/registration-submit', function (req, res) {
 });
 
 //login page
-app.get('/login', function(req,res){
-    res.sendFile(__dirname + '/login.html')
-})
+app.get('/login', function (req, res) {
+  res.sendFile(__dirname + '/login.html');
+});
 
-app.post('/login-submit', function(req,res){
+app.post('/login-submit', function (req, res) {
 
-    // login.get_json(req.body)
-    res.sendFile(__dirname + '/quiz.html')
+  // login.get_json(req.body)
+  res.sendFile(__dirname + '/quiz.html');
 
-})
+});
 
 //This function returns the saved results from the DB and presents it back to the user
 // WORK IN PROGRESS 02/02/2022 11:39am
 app.get('/quiz-results', function (req, res) {
 
   //Data from sql
-  var data = sqltest.queryFromDatabase();
+  var data = sql_api.queryFromDatabase();
   console.log(typeof data);
   console.log("From the function call: " + data);
 
