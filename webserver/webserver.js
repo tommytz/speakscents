@@ -18,7 +18,6 @@ var app = express();
 
 //Local modules required
 var form = require('./form-reader.js');
-var reg = require('./registration.js');
 
 //Server details
 const { allowedNodeEnvironmentFlags } = require('process');
@@ -65,8 +64,7 @@ app.post("/quiz-submit", function (req, res) {
   //Responds client to submission page
   res.sendFile(__dirname + "/quiz_results.html");
 
-  //send to quiz results page
-  res.sendFile(__dirname + '/quiz_results.html');
+ 
 });
 
 //Registration page
@@ -77,7 +75,7 @@ app.get('/registration', function (req, res) {
 //Submit registered data and returns them to the quiz.html page
 app.post('/registration-submit', function (req, res) {
 
-  reg.get_json(req.body);
+  form.get_json(req.body);
 
   //code for database injection goes here
   res.sendFile(__dirname + '/quiz.html');
@@ -93,7 +91,7 @@ app.get('/login', function (req, res) {
 //TODO don't yet have login verification
 app.post('/login-submit', function(req,res){
 
-  // login.get_json(req.body)
+  form.get_json(req.body);
   res.sendFile(__dirname + '/quiz.html');
 
 });
