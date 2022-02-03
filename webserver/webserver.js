@@ -99,7 +99,7 @@ app.post('/login-submit', function (req, res) {
 app.get('/quiz-results', function (req, res) {
 
   //Data from sql
-  var data = sql_api.readLastEntry();
+  var data = sql_api.readQuizEntry();
   var values = []
 
   data.then((result) => {
@@ -108,25 +108,25 @@ app.get('/quiz-results', function (req, res) {
       values.push(result[i]);
     }
   }).then(() => {
-    console.log("=================================");
-    console.log(values);
+        console.log("=================================");
+        console.log(values);
 
-  var suggestions = values[0];
-  var time = values[1];
-  var season = values[2];
-  var scentStrength = values[3];
-  var scentMood = values[4];
-  var scentStyles = values[5];
+      var suggestions = values[0];
+      var time = values[1];
+      var season = values[2];
+      var scentStrength = values[3];
+      var scentMood = values[4];
+      var scentStyles = values[5];
 
-  res.render("quiz_results", {
-    suggestions: suggestions,
-    time: time,
-    season: season,
-    scentStrength: scentStrength,
-    scentMood: scentMood,
-    scentStyles: scentStyles
+      res.render("quiz_results", {
+        suggestions: suggestions,
+        time: time,
+        season: season,
+        scentStrength: scentStrength,
+        scentMood: scentMood,
+        scentStyles: scentStyles
+      });
+
   });
-
-  })
 
 });

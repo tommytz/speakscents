@@ -97,7 +97,34 @@ const insertToDatabase = function (unparsedJSON) {
 };
 
 // Retrieves final row from customer DB (sorted descending by quiz_id) and returns quiz answers to webserver caller
-function readLastEntry() {
+let queryFromDatabase = function () {
+  console.log("Reading from Table...");
+  let result_list = [];
+
+  // read all data
+  const request = new Request(
+    `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM quiz_results ORDER BY quiz_results.quiz_id DESC`, (err) => {
+      if (err) {
+        console.error(err.message);
+      } else {
+        console.log("Successfully requested");
+        console.log(result_list);
+        return JSON.stringify(result_list);
+      }
+    });
+  request.on("row", columns => {
+    columns.forEach(column => {
+      //console.log("%s\t%s", column.metadata.colName, column.value);
+      let temp = `${column.metadata.colName}: ${column.value}`;
+      result_list.push(temp);
+    });
+  });
+  connection.execSql(request);
+};
+
+
+// Retrieves final row from customer DB and returns to quiz results page
+function readQuizEntry() {
 
   return queryPromise = new Promise((resolve, reject) => {
 
@@ -138,8 +165,4 @@ function readLastEntry() {
 }
 
 
-
-
-
-
-module.exports = { connect2DB, insertToDatabase, readLastEntry };
+module.exports = { connect2DB, insertToDatabase, readQuizEntry };
