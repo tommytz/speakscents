@@ -99,7 +99,7 @@ const insertToDatabase = function (unparsedJSON) {
     request.addParameter(`q${i + 1}`, TYPES.VarChar, qi);
   }
   console.log("Done: " + answer_array.length);
-  // connection.execSql(request);
+  connection.execSql(request);
 };
 
 // Retrieves final row from customer DB (sorted descending by quiz_id) and returns quiz answers to webserver caller
@@ -165,7 +165,7 @@ const insertToDatabaseRegistration = function (unparsedJSON) {
   request.addParameter('email', TYPES.VarChar, answer_array[2]);
   
   console.log("Done: " + answer_array.length);
-  // connection.execSql(request);
+  connection.execSql(request);
 };
 
 module.exports = { connect2DB, insertToDatabase, queryFromDatabase, insertToDatabaseRegistration };
