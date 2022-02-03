@@ -44,7 +44,6 @@ const connect2DB = function () {
 //This uploads data from the webserver to the customer database
 const insertToDatabase = function (unparsedJSON) {
   console.log("Inserting into Table...");
-  // var parsedJSON = JSON.parse(unparsedJSON);
   var answer_array = [];
   for (data in unparsedJSON) {
     let temp = unparsedJSON[data];
@@ -53,37 +52,14 @@ const insertToDatabase = function (unparsedJSON) {
     }
     answer_array.push(temp);
   }
-
   console.log(answer_array);
 
-  // Dynamically constructing the columns to insert into for SQL query
-  let cols = [];
-  for (var i = 0; i < answer_array.length; i++) {
-    cols.push(`question_${i + 1}`);
-  }
-  let cols_string = cols.join(", ");
-  cols_string += ") ";
-
-  // Dynamically constructing the parameterised values for the SQL query
-  let params = [];
-  for (var i = 0; i < answer_array.length; i++) {
-    params.push(`@q${i + 1}`);
-  }
-  let params_string = params.join(", ");
-  params_string += ")";
-
   // Constructing the request for the insert query
-  // var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) `;
   var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, `;
-  query += cols_string;
-
-  // var values = `VALUES ('123', 'answer', 'cluster', '1', @q1, @q2, @q3, @q4, @q5, @q6)`;
   var values = `VALUES ('123', 'answer', 'cluster', '1', `;
-  values += params_string;
+  query += generateQuizCols(answer_array) + values + generateQuizParams(answer_array);
 
-  console.log("\n" + query + values + "\n");
-
-  const request = new Request(query + values
+  const request = new Request(query
     , (err) => {
       if (err) {
         console.log("Unable to insert data");
@@ -102,7 +78,7 @@ const insertToDatabase = function (unparsedJSON) {
 };
 
 // Retrieves final row from customer DB (sorted descending by quiz_id) and returns quiz answers to webserver caller
-let queryFromDatabase = function () {
+const queryFromDatabase = function () {
   console.log("Reading from Table...");
   let result_list = [];
 
@@ -125,6 +101,28 @@ let queryFromDatabase = function () {
     });
   });
   connection.execSql(request);
+};
+
+// Dynamically constructing the columns to insert into for SQL query string
+const generateQuizCols = function (quiz_answers) {
+  let cols = [];
+  for (var i = 0; i < quiz_answers.length; i++) {
+    cols.push(`question_${i + 1}`);
+  }
+  let cols_string = cols.join(", ");
+  cols_string += ") ";
+  return cols_string;
+};
+
+// Dynamically constructing the parameterised values for the SQL query
+const generateQuizParams = function (quiz_answers) {
+  let params = [];
+  for (var i = 0; i < quiz_answers.length; i++) {
+    params.push(`@q${i + 1}`);
+  }
+  let params_string = params.join(", ");
+  params_string += ")";
+  return params_string;
 };
 
 module.exports = { connect2DB, insertToDatabase, queryFromDatabase };
