@@ -99,7 +99,7 @@ const insertToDatabase = function (unparsedJSON) {
     request.addParameter(`q${i + 1}`, TYPES.VarChar, qi);
   }
   console.log("Done: " + answer_array.length);
-  // connection.execSql(request);
+  connection.execSql(request);
 };
 
 // Retrieves final row from customer DB (sorted descending by quiz_id) and returns quiz answers to webserver caller
@@ -128,4 +128,44 @@ let queryFromDatabase = function () {
   connection.execSql(request);
 };
 
-module.exports = { connect2DB, insertToDatabase, queryFromDatabase };
+const insertToDatabaseRegistration = function (unparsedJSON) {
+  console.log("Inserting into Table...");
+  // var parsedJSON = JSON.parse(unparsedJSON);
+  var answer_array = [];
+  for (data in unparsedJSON) {
+    let temp = unparsedJSON[data];
+    if (temp instanceof Array) {
+      temp = JSON.stringify(temp);
+    }
+    answer_array.push(temp);
+  }
+
+  console.log(answer_array);
+
+
+
+  // Constructing the request for the insert query
+  var query = `INSERT INTO user_accounts (customer_id, name, password, email) `;
+  var values = ` VALUES (123, @name, @password, @email) `;
+
+  
+
+  const request = new Request(query + values
+    , (err) => {
+      if (err) {
+        console.log("Unable to insert data");
+        console.error(err.message);
+      } else {
+        console.log("Data inserted");
+      }
+    });
+
+  request.addParameter('name', TYPES.VarChar, answer_array[0] + " " + answer_array[1]);
+  request.addParameter('password', TYPES.VarChar, answer_array[4]);
+  request.addParameter('email', TYPES.VarChar, answer_array[2]);
+  
+  console.log("Done: " + answer_array.length);
+  connection.execSql(request);
+};
+
+module.exports = { connect2DB, insertToDatabase, queryFromDatabase, insertToDatabaseRegistration };
