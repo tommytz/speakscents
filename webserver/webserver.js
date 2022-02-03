@@ -30,6 +30,8 @@ app.use(upload.array());
 app.use(express.static('public'));
 app.use(flash());
 app.use('/css', express.static(__dirname + '/css'));
+app.use('/static_scripts', express.static(__dirname + '/static_scripts'));
+
 
 //Changing the engine to ejs, so we can view/embed data in particular way, that can we can then manipulate in express
 //This replaces serving a html file, instead of send file, we use render. Please don't edit, thanks AL
