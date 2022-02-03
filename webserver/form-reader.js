@@ -26,7 +26,7 @@ const get_results = function (body) {
     if (data_elements[i].type === "radio" || data_elements[i].type === "checkbox") {
       data = data + `"${data_elements[i].getAttribute("id")}":"${data_elements[i].checked}"`;
 
-    } else if (data_elements[i].type === "text") {
+    } else if (data_elements[i].type === "text"|| reg_elements[i].type === "email" || reg_elements[i].type === "tel" || reg_elements[i].type === "password") {
       data = data + `"${data_elements[i].getAttribute("id")}":"${data_elements[i].value}"`;
 
     }
@@ -49,7 +49,7 @@ const get_results = function (body) {
 //Returning straight JSON file of the form data.
 //
 const get_json = function (body) {
-
+  // console.log(body);
   return body;
 };
 

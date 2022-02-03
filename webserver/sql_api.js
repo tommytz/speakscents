@@ -1,4 +1,13 @@
-// https://docs.microsoft.com/en-us/azure/azure-sql/database/connect-query-nodejs?tabs=windows
+/* This module is responsible for querying the database.
+ * This module handles the following:
+ * - Connection configuration
+ * - Execute SQL request (CRUD functions)
+ * 
+ * Configuration details: // https://docs.microsoft.com/en-us/azure/azure-sql/database/connect-query-nodejs?tabs=windows
+ * ============================================================================================
+ *  No validation of data should happen here. Should be done serverside in the form-reader.js
+ * ============================================================================================
+ */
 
 const { reject } = require("lodash");
 const { charset } = require("mime-types");
@@ -34,7 +43,7 @@ const connect2DB = function () {
 
   connection.on("connect", err => {
     if (err) {
-   
+
       console.error(err.message);
     } else {
       console.log("successful connection");
@@ -47,7 +56,6 @@ const connect2DB = function () {
 //This uploads data from the webserver to the customer database
 const insertToDatabase = function (unparsedJSON) {
   console.log("Inserting into Table...");
-  // var parsedJSON = JSON.parse(unparsedJSON);
   var answer_array = [];
   for (data in unparsedJSON) {
     let temp = unparsedJSON[data];
@@ -56,23 +64,14 @@ const insertToDatabase = function (unparsedJSON) {
     }
     answer_array.push(temp);
   }
-
   console.log(answer_array);
 
-  //Saving json fields into list
-  // var q1 = answer_array[0];
-  // var q2 = answer_array[1];
-  // var q3 = answer_array[2];
-  // var q4 = answer_array[3];
-  // var q5 = answer_array[4];
-  // var q6 = answer_array[5];
-
-  // console.log(q1);
-
   // Constructing the request for the insert query
-  var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) `;
-  var values = `VALUES ('123', 'answer', 'cluster', '1', @q1, @q2, @q3, @q4, @q5, @q6)`;
-  const request = new Request(query + values
+  var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, `;
+  var values = `VALUES ('123', 'answer', 'cluster', '1', `;
+  query += generateQuizCols(answer_array) + values + generateQuizParams(answer_array);
+
+  const request = new Request(query
     , (err) => {
       if (err) {
         console.log("Unable to insert data");
@@ -81,23 +80,17 @@ const insertToDatabase = function (unparsedJSON) {
         console.log("Data inserted");
       }
     });
-  // request.addParameter('q1', TYPES.VarChar, q1);
-  // request.addParameter('q2', TYPES.VarChar, q2);
-  // request.addParameter('q3', TYPES.VarChar, q3);
-  // request.addParameter('q4', TYPES.VarChar, q4);
-  // request.addParameter('q5', TYPES.VarChar, q5);
-  // request.addParameter('q6', TYPES.VarChar, q6);
-  for (let i = 0; i < 6; i++) {
+
+  for (var i = 0; i < answer_array.length; i++) {
     let qi = answer_array[i];
-    console.log("i: " + i + ", answer " + (i + 1) + ": " + qi + " ==> " + `q${i + 1}`);
     request.addParameter(`q${i + 1}`, TYPES.VarChar, qi);
+    console.log("answer " + (i + 1) + ": " + qi + " ==> " + `q${i + 1}`);
   }
-  console.log("Done: " + answer_array.length);
   connection.execSql(request);
 };
 
 // Retrieves final row from customer DB (sorted descending by quiz_id) and returns quiz answers to webserver caller
-let queryFromDatabase = function () {
+const queryFromDatabase = function () {
   console.log("Reading from Table...");
   let result_list = [];
 
@@ -122,27 +115,26 @@ let queryFromDatabase = function () {
   connection.execSql(request);
 };
 
-
 // Retrieves final row from customer DB and returns to quiz results page
 function readQuizEntry() {
 
   return queryPromise = new Promise((resolve, reject) => {
 
     var result = [];
-    let sql = `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM quiz_results ORDER BY quiz_results.quiz_id DESC`
+    let sql = `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM quiz_results ORDER BY quiz_results.quiz_id DESC`;
 
     const request = new Request(sql, (err) => {
-      if (err){
+      if (err) {
 
         reject();
       } else {
-      
+
         resolve(result);
       }
     });
 
-    request.on("row", function(columns) { //on the returned row(s)
-      columns.forEach(function(column) { //for each of the columns in the row(s)
+    request.on("row", function (columns) { //on the returned row(s)
+      columns.forEach(function (column) { //for each of the columns in the row(s)
         // console.log(`${column.metadata.colName}: ${column.value}`); //Print the columnname : value
         let temp = (`${column.value}`);
         result.push(temp);
@@ -156,13 +148,65 @@ function readQuizEntry() {
     return result;
   }).catch((err) => {
 
-    console.log( err + "error in catch")
+    console.log(err + "error in catch");
   });
-
-
-
-
 }
 
+const insertToDatabaseRegistration = function (unparsedJSON) {
+  console.log("Inserting into Table...");
+  // var parsedJSON = JSON.parse(unparsedJSON);
+  var answer_array = [];
+  for (data in unparsedJSON) {
+    let temp = unparsedJSON[data];
+    if (temp instanceof Array) {
+      temp = JSON.stringify(temp);
+    }
+    answer_array.push(temp);
+  }
+  console.log(answer_array);
 
-module.exports = { connect2DB, insertToDatabase, readQuizEntry };
+  // Constructing the request for the insert query
+  var query = `INSERT INTO user_accounts (customer_id, name, password, email) `;
+  var values = ` VALUES (123, @name, @password, @email) `;
+
+  const request = new Request(query + values
+    , (err) => {
+      if (err) {
+        console.log("Unable to insert data");
+        console.error(err.message);
+      } else {
+        console.log("Data inserted");
+      }
+    });
+
+  request.addParameter('name', TYPES.VarChar, answer_array[0] + " " + answer_array[1]);
+  request.addParameter('password', TYPES.VarChar, answer_array[4]);
+  request.addParameter('email', TYPES.VarChar, answer_array[2]);
+
+  console.log("Done: " + answer_array.length);
+  connection.execSql(request);
+};
+
+// Dynamically constructing the columns to insert into for SQL query string
+const generateQuizCols = function (quiz_answers) {
+  let cols = [];
+  for (var i = 0; i < quiz_answers.length; i++) {
+    cols.push(`question_${i + 1}`);
+  }
+  let cols_string = cols.join(", ");
+  cols_string += ") ";
+  return cols_string;
+};
+
+// Dynamically constructing the parameterised values for the SQL query
+const generateQuizParams = function (quiz_answers) {
+  let params = [];
+  for (var i = 0; i < quiz_answers.length; i++) {
+    params.push(`@q${i + 1}`);
+  }
+  let params_string = params.join(", ");
+  params_string += ")";
+  return params_string;
+};
+
+module.exports = { connect2DB, insertToDatabase, queryFromDatabase, readQuizEntry, insertToDatabaseRegistration };

@@ -6,11 +6,10 @@
  * - Process http post/get requests
  */
 
-// Dependencies and required internal node.js modules
+//Dependencies and required internal node.js modules
 var express = require('express');
 var bodyParser = require('body-parser');
 var multer = require('multer');
-var sql_api = require('./sql_api');
 var flash = require('connect-flash');
 var ejs = require('ejs');
 var upload = multer();
@@ -18,7 +17,7 @@ var app = express();
 
 //Local modules required
 var form = require('./form-reader.js');
-var reg = require('./registration.js');
+var sql_api = require('./sql_api');
 
 //Server details
 const { allowedNodeEnvironmentFlags } = require('process');
@@ -31,6 +30,8 @@ app.use(upload.array());
 app.use(express.static('public'));
 app.use(flash());
 app.use('/css', express.static(__dirname + '/css'));
+app.use('/static_scripts', express.static(__dirname + '/static_scripts'));
+
 
 //Changing the engine to ejs, so we can view/embed data in particular way, that can we can then manipulate in express
 //This replaces serving a html file, instead of send file, we use render. Please don't edit, thanks AL
@@ -65,6 +66,7 @@ app.post("/quiz-submit", function (req, res) {
   //Responds client to submission page
   res.sendFile(__dirname + "/quiz_results.html");
 
+
 });
 
 //Registration page
@@ -75,7 +77,9 @@ app.get('/registration', function (req, res) {
 //Submit registered data and returns them to the quiz.html page
 app.post('/registration-submit', function (req, res) {
 
-  reg.get_json(req.body);
+  var jsonObject = form.get_json(req.body);
+
+  sql_api.insertToDatabaseRegistration(jsonObject);
 
   //code for database injection goes here
   res.sendFile(__dirname + '/quiz.html');
@@ -87,9 +91,11 @@ app.get('/login', function (req, res) {
   res.sendFile(__dirname + '/login.html');
 });
 
+//login details submit
+//TODO don't yet have login verification
 app.post('/login-submit', function (req, res) {
 
-  // login.get_json(req.body)
+  form.get_json(req.body);
   res.sendFile(__dirname + '/quiz.html');
 
 });
@@ -100,32 +106,32 @@ app.get('/quiz-results', function (req, res) {
 
   //Data from sql
   var data = sql_api.readQuizEntry();
-  var values = []
+  var values = [];
 
   data.then((result) => {
     // console.log(result);
-    for(var i in result){
+    for (var i in result) {
       values.push(result[i]);
     }
   }).then(() => {
-        console.log("=================================");
-        console.log(values);
+    console.log("=================================");
+    console.log(values);
 
-      var suggestions = values[0];
-      var time = values[1];
-      var season = values[2];
-      var scentStrength = values[3];
-      var scentMood = values[4];
-      var scentStyles = values[5];
+    var suggestions = values[0];
+    var time = values[1];
+    var season = values[2];
+    var scentStrength = values[3];
+    var scentMood = values[4];
+    var scentStyles = values[5];
 
-      res.render("quiz_results", {
-        suggestions: suggestions,
-        time: time,
-        season: season,
-        scentStrength: scentStrength,
-        scentMood: scentMood,
-        scentStyles: scentStyles
-      });
+    res.render("quiz_results", {
+      suggestions: suggestions,
+      time: time,
+      season: season,
+      scentStrength: scentStrength,
+      scentMood: scentMood,
+      scentStyles: scentStyles
+    });
 
   });
 
