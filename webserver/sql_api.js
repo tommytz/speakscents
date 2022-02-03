@@ -9,8 +9,11 @@
  * ============================================================================================
  */
 
+const { reject } = require("lodash");
 const { charset } = require("mime-types");
+const { resolve } = require("path/posix");
 const { Connection, Request, TYPES } = require("tedious");
+const { callbackify } = require("util");
 const username = "Morgan";
 const password = "TestDB0001928";
 const server_name = "speakscents-test-server.database.windows.net";
@@ -40,7 +43,7 @@ const connect2DB = function () {
 
   connection.on("connect", err => {
     if (err) {
-      console.log("error flag");
+
       console.error(err.message);
     } else {
       console.log("successful connection");
@@ -112,6 +115,43 @@ const queryFromDatabase = function () {
   connection.execSql(request);
 };
 
+// Retrieves final row from customer DB and returns to quiz results page
+function readQuizEntry() {
+
+  return queryPromise = new Promise((resolve, reject) => {
+
+    var result = [];
+    let sql = `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM quiz_results ORDER BY quiz_results.quiz_id DESC`;
+
+    const request = new Request(sql, (err) => {
+      if (err) {
+
+        reject();
+      } else {
+
+        resolve(result);
+      }
+    });
+
+    request.on("row", function (columns) { //on the returned row(s)
+      columns.forEach(function (column) { //for each of the columns in the row(s)
+        // console.log(`${column.metadata.colName}: ${column.value}`); //Print the columnname : value
+        let temp = (`${column.value}`);
+        result.push(temp);
+      });
+    });
+
+    connection.execSql(request);
+
+  }).then((result) => {
+
+    return result;
+  }).catch((err) => {
+
+    console.log(err + "error in catch");
+  });
+}
+
 const insertToDatabaseRegistration = function (unparsedJSON) {
   console.log("Inserting into Table...");
   // var parsedJSON = JSON.parse(unparsedJSON);
@@ -169,4 +209,4 @@ const generateQuizParams = function (quiz_answers) {
   return params_string;
 };
 
-module.exports = { connect2DB, insertToDatabase, queryFromDatabase, insertToDatabaseRegistration };
+module.exports = { connect2DB, insertToDatabase, queryFromDatabase, readQuizEntry, insertToDatabaseRegistration };

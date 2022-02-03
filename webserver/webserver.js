@@ -66,7 +66,7 @@ app.post("/quiz-submit", function (req, res) {
   //Responds client to submission page
   res.sendFile(__dirname + "/quiz_results.html");
 
- 
+
 });
 
 //Registration page
@@ -93,7 +93,7 @@ app.get('/login', function (req, res) {
 
 //login details submit
 //TODO don't yet have login verification
-app.post('/login-submit', function(req,res){
+app.post('/login-submit', function (req, res) {
 
   form.get_json(req.body);
   res.sendFile(__dirname + '/quiz.html');
@@ -105,28 +105,34 @@ app.post('/login-submit', function(req,res){
 app.get('/quiz-results', function (req, res) {
 
   //Data from sql
-  var data = sql_api.queryFromDatabase();
-  console.log(typeof data);
-  console.log("From the function call: " + data);
+  var data = sql_api.readQuizEntry();
+  var values = [];
 
-  let html = ejs.render('<%= people.join(", "); %>', {people: people});
+  data.then((result) => {
+    // console.log(result);
+    for (var i in result) {
+      values.push(result[i]);
+    }
+  }).then(() => {
+    console.log("=================================");
+    console.log(values);
 
-  var suggestions = "hellow";
-  var time = "mate";
-  var season = "what's going on?";
-  var scentStrength = "you ok buddy?";
-  var scentMood = "see ya matey";
-  var scentStyles = "potatey";
+    var suggestions = values[0];
+    var time = values[1];
+    var season = values[2];
+    var scentStrength = values[3];
+    var scentMood = values[4];
+    var scentStyles = values[5];
 
+    res.render("quiz_results", {
+      suggestions: suggestions,
+      time: time,
+      season: season,
+      scentStrength: scentStrength,
+      scentMood: scentMood,
+      scentStyles: scentStyles
+    });
 
-  res.render("quiz_results", {
-    suggestions: suggestions,
-    time: time,
-    season: season,
-    scentStrength: scentStrength,
-    scentMood: scentMood,
-    scentStyles: scentStyles
   });
-
 
 });
