@@ -26,69 +26,65 @@
       <img src="/css/logo.png" alt="logo" id="logo">
       <h2>Let your <strong>scent</strong> do the talking</h2>
     </div>
+
     <div id="form">
       <h1>Find Your Match</h1>
-      <!-- <form id="quiz" method="post" action="quiz-submit"> -->
-      <form id="quiz">
+      <form id="quiz" method="post" action="quiz-submit">
+        <!-- <form id="quiz"> -->
         <ol>
           <li class="quiz_list">
             <label for="recommended_scents_title">What scents do you like or do your friends recommend?</label>
             <input type="text" id="recommended_scents" name="scent_suggestions">
           </li>
+
           <li class="quiz_list">
             <label for="night_or_day">When do you want to wear this?</label>
             <div>
-
               <input type="radio" id="day_answer" name="day_or_night" value="day">
               <label for="day">Day</label>
             </div>
             <div>
-
               <input type="radio" id="night_answer" name="day_or_night" value="night">
               <label for="night">Night</label>
             </div>
+
           </li>
           <li class="quiz_list">
             <label for="seasonal">When do you want to wear this?</label>
             <div>
-
               <input type="radio" id="season_summer" name="season" value="summer">
               <label for="summer">Summer</label>
             </div>
             <div>
-
               <input type="radio" id="season_autumn" name="season" value="autumn">
               <label for="autumn">Autumn</label>
             </div>
             <div>
-
               <input type="radio" id="season_winter" name="season" value="winter">
               <label for="winter">Winter</label>
             </div>
             <div>
-
               <input type="radio" id="season_spring" name="season" value="spring">
               <label for="spring">Spring</label>
             </div>
+
           </li>
           <li class="quiz_list">
             <label for="gender_scent">Do you want a more masculine or feminine scent?</label>
             <div>
-
               <input type="radio" id="strength_masculine" name="gender" value="masculine">
               <label for="masculine">Masculine</label>
             </div>
             <div>
-
               <input type="radio" id="strength_feminine" name="gender" value="feminine">
               <label for="feminine">Feminine</label>
             </div>
             <div>
-
               <input type="radio" id="strength_no_pref" name="gender" value="no_gender">
               <label for="no_pref">No Preference</label>
             </div>
           </li>
+
           <li class="quiz_list">
             <label for="mood">How would you like to feel while wearing your fragrance?</label>
             <div>
@@ -116,6 +112,7 @@
               <label for="cool">Cool</label>
             </div>
           </li>
+
           <li class="quiz_list">
             <label for="scent_types">Would you wear...</label>
             <div>
@@ -143,10 +140,12 @@
               <label for="aquatic">Aquatic</label>
             </div>
         </ol>
+
         <button type="submit" id="submit_btn">Submit Form</button>
       </form>
+
     </div>
-    <script type="text/javascript" src="static_scripts/format_quiz_data.js"></script>
+    <!-- <script src="static_scripts/format_quiz_data.js"></script> -->
   </body>
 
 </html>

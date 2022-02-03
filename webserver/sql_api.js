@@ -56,19 +56,33 @@ const insertToDatabase = function (unparsedJSON) {
 
   console.log(answer_array);
 
-  //Saving json fields into list
-  // var q1 = answer_array[0];
-  // var q2 = answer_array[1];
-  // var q3 = answer_array[2];
-  // var q4 = answer_array[3];
-  // var q5 = answer_array[4];
-  // var q6 = answer_array[5];
+  // Dynamically constructing the columns to insert into for SQL query
+  let cols = [];
+  for (var i = 0; i < answer_array.length; i++) {
+    cols.push(`question_${i + 1}`);
+  }
+  let cols_string = cols.join(", ");
+  cols_string += ") ";
 
-  // console.log(q1);
+  // Dynamically constructing the parameterised values for the SQL query
+  let params = [];
+  for (var i = 0; i < answer_array.length; i++) {
+    params.push(`@q${i + 1}`);
+  }
+  let params_string = params.join(", ");
+  params_string += ")";
 
-  // Constructing the request for the insert query ADD LOOP FOR QUESTON NUMBERS IN SQL QUERY STRING (e.g. add q${i} to empty string)
-  var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) `;
-  var values = `VALUES ('123', 'answer', 'cluster', '1', @q1, @q2, @q3, @q4, @q5, @q6)`;
+  // Constructing the request for the insert query
+  // var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, question_1, question_2, question_3, question_4, question_5, question_6) `;
+  var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, `;
+  query += cols_string;
+
+  // var values = `VALUES ('123', 'answer', 'cluster', '1', @q1, @q2, @q3, @q4, @q5, @q6)`;
+  var values = `VALUES ('123', 'answer', 'cluster', '1', `;
+  values += params_string;
+
+  console.log("\n" + query + values + "\n");
+
   const request = new Request(query + values
     , (err) => {
       if (err) {
@@ -78,19 +92,13 @@ const insertToDatabase = function (unparsedJSON) {
         console.log("Data inserted");
       }
     });
-  // request.addParameter('q1', TYPES.VarChar, q1);
-  // request.addParameter('q2', TYPES.VarChar, q2);
-  // request.addParameter('q3', TYPES.VarChar, q3);
-  // request.addParameter('q4', TYPES.VarChar, q4);
-  // request.addParameter('q5', TYPES.VarChar, q5);
-  // request.addParameter('q6', TYPES.VarChar, q6);
-  for (let i = 0; i < 6; i++) {
+
+  for (var i = 0; i < answer_array.length; i++) {
     let qi = answer_array[i];
-    console.log("i: " + i + ", answer " + (i + 1) + ": " + qi + " ==> " + `q${i + 1}`);
     request.addParameter(`q${i + 1}`, TYPES.VarChar, qi);
+    console.log("answer " + (i + 1) + ": " + qi + " ==> " + `q${i + 1}`);
   }
-  console.log("Done: " + answer_array.length);
-  // connection.execSql(request);
+  connection.execSql(request);
 };
 
 // Retrieves final row from customer DB (sorted descending by quiz_id) and returns quiz answers to webserver caller
