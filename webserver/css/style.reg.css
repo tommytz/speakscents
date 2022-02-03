@@ -1,3 +1,6 @@
+/* style settings for the registration.html */
+
+
 label{
     cursor: pointer;
     display: inline-block;
@@ -5,4 +8,29 @@ label{
     text-align: right;
     width: 130px;
     vertical-align: top;
+}
+
+.reg_list {
+    padding: 10px;
+    margin: 10px;
+    /* text-align: center; */
+}
+
+.reg_form {
+    border: 2px solid rgb(255, 135, 23);
+    border-radius: 25px;
+}
+
+#form {
+
+    margin: auto;
+    width: fit-content;
+
+}
+
+#heading {
+    background-color: rgb(255, 135, 23);
+
+    width: 100%;
+    text-align: center;
 }

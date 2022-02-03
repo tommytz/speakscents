@@ -6,11 +6,10 @@
  * - Process http post/get requests
  */
 
-// Dependencies and required internal node.js modules
+//Dependencies and required internal node.js modules
 var express = require('express');
 var bodyParser = require('body-parser');
 var multer = require('multer');
-var sql_api = require('./sql_api');
 var flash = require('connect-flash');
 var ejs = require('ejs');
 var upload = multer();
@@ -18,7 +17,7 @@ var app = express();
 
 //Local modules required
 var form = require('./form-reader.js');
-var reg = require('./registration.js');
+var sql_api = require('./sql_api');
 
 //Server details
 const { allowedNodeEnvironmentFlags } = require('process');
@@ -67,6 +66,7 @@ app.post("/quiz-submit", function (req, res) {
   //Responds client to submission page
   res.sendFile(__dirname + "/quiz_results.html");
 
+ 
 });
 
 //Registration page
@@ -77,7 +77,9 @@ app.get('/registration', function (req, res) {
 //Submit registered data and returns them to the quiz.html page
 app.post('/registration-submit', function (req, res) {
 
-  reg.get_json(req.body);
+  var jsonObject = form.get_json(req.body);
+
+  sql_api.insertToDatabaseRegistration(jsonObject);
 
   //code for database injection goes here
   res.sendFile(__dirname + '/quiz.html');
@@ -89,9 +91,11 @@ app.get('/login', function (req, res) {
   res.sendFile(__dirname + '/login.html');
 });
 
-app.post('/login-submit', function (req, res) {
+//login details submit
+//TODO don't yet have login verification
+app.post('/login-submit', function(req,res){
 
-  // login.get_json(req.body)
+  form.get_json(req.body);
   res.sendFile(__dirname + '/quiz.html');
 
 });
@@ -105,7 +109,7 @@ app.get('/quiz-results', function (req, res) {
   console.log(typeof data);
   console.log("From the function call: " + data);
 
-  // let html = ejs.render('<%= people.join(", "); %>', {people: people});
+  let html = ejs.render('<%= people.join(", "); %>', {people: people});
 
   var suggestions = "hellow";
   var time = "mate";

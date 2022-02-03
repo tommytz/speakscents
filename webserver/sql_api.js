@@ -1,4 +1,13 @@
-// https://docs.microsoft.com/en-us/azure/azure-sql/database/connect-query-nodejs?tabs=windows
+/* This module is responsible for querying the database.
+ * This module handles the following:
+ * - Connection configuration
+ * - Execute SQL request (CRUD functions)
+ * 
+ * Configuration details: // https://docs.microsoft.com/en-us/azure/azure-sql/database/connect-query-nodejs?tabs=windows
+ * ============================================================================================
+ *  No validation of data should happen here. Should be done serverside in the form-reader.js
+ * ============================================================================================
+ */
 
 const { charset } = require("mime-types");
 const { Connection, Request, TYPES } = require("tedious");
@@ -103,6 +112,41 @@ const queryFromDatabase = function () {
   connection.execSql(request);
 };
 
+const insertToDatabaseRegistration = function (unparsedJSON) {
+  console.log("Inserting into Table...");
+  // var parsedJSON = JSON.parse(unparsedJSON);
+  var answer_array = [];
+  for (data in unparsedJSON) {
+    let temp = unparsedJSON[data];
+    if (temp instanceof Array) {
+      temp = JSON.stringify(temp);
+    }
+    answer_array.push(temp);
+  }
+  console.log(answer_array);
+
+  // Constructing the request for the insert query
+  var query = `INSERT INTO user_accounts (customer_id, name, password, email) `;
+  var values = ` VALUES (123, @name, @password, @email) `;
+
+  const request = new Request(query + values
+    , (err) => {
+      if (err) {
+        console.log("Unable to insert data");
+        console.error(err.message);
+      } else {
+        console.log("Data inserted");
+      }
+    });
+
+  request.addParameter('name', TYPES.VarChar, answer_array[0] + " " + answer_array[1]);
+  request.addParameter('password', TYPES.VarChar, answer_array[4]);
+  request.addParameter('email', TYPES.VarChar, answer_array[2]);
+
+  console.log("Done: " + answer_array.length);
+  connection.execSql(request);
+};
+
 // Dynamically constructing the columns to insert into for SQL query string
 const generateQuizCols = function (quiz_answers) {
   let cols = [];
@@ -125,4 +169,4 @@ const generateQuizParams = function (quiz_answers) {
   return params_string;
 };
 
-module.exports = { connect2DB, insertToDatabase, queryFromDatabase };
+module.exports = { connect2DB, insertToDatabase, queryFromDatabase, insertToDatabaseRegistration };
