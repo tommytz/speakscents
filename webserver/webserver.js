@@ -100,22 +100,23 @@ app.get('/quiz-results', function (req, res) {
 
   //Data from sql
   var data = sql_api.readLastEntry();
-  // console.log(data + "^.^");
+  var values = []
 
+  data.then((result) => {
+    // console.log(result);
+    for(var i in result){
+      values.push(result[i]);
+    }
+  }).then(() => {
+    console.log("=================================");
+    console.log(values);
 
-  // console.log(data);
-  // console.log("+++++++++++++")
-
-
-  // let html = ejs.render('<%= people.join(", "); %>', {people: people});
-
-  var suggestions = "hellow";
-  var time = "mate";
-  var season = "what's going on?";
-  var scentStrength = "you ok buddy?";
-  var scentMood = "see ya matey";
-  var scentStyles = "potatey";
-
+  var suggestions = values[0];
+  var time = values[1];
+  var season = values[2];
+  var scentStrength = values[3];
+  var scentMood = values[4];
+  var scentStyles = values[5];
 
   res.render("quiz_results", {
     suggestions: suggestions,
@@ -126,5 +127,6 @@ app.get('/quiz-results', function (req, res) {
     scentStyles: scentStyles
   });
 
+  })
 
 });

@@ -93,50 +93,13 @@ const insertToDatabase = function (unparsedJSON) {
     request.addParameter(`q${i + 1}`, TYPES.VarChar, qi);
   }
   console.log("Done: " + answer_array.length);
-  // connection.execSql(request);
+  connection.execSql(request);
 };
 
 // Retrieves final row from customer DB (sorted descending by quiz_id) and returns quiz answers to webserver caller
-const queryFromDatabase = function () {
-  let queryString = `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM quiz_results ORDER BY quiz_results.quiz_id DESC`
-  let result_list = [];
-
-  // read all data
-  const request = new Request( queryString  , (err) => {
-      if (err) {
-        console.error(err.message);
-      } else {
-        console.log("Successfully requested");
-        // console.log(result_list);
-      }
-    });
-  
-  request.on('prepared', function () { });
-
-  request.on("row", columns => {
-    columns.forEach(column => {
-      //console.log("%s\t%s", column.metadata.colName, column.value);
-      let temp = `${column.metadata.colName}: ${column.value}`;
-      result_list.push(temp);
-    });
-  });
-
-  connection.execSql(request);
-
- 
-};
-
-
-//reads last row of data from the quiz data table
-const readDB = function () {
-
-    let queryString = `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM quiz_results ORDER BY quiz_results.quiz_id DESC`
-    
-}
-
 function readLastEntry() {
 
-  let testPromise = new Promise((resolve, reject) => {
+  return queryPromise = new Promise((resolve, reject) => {
 
     var result = [];
     let sql = `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM quiz_results ORDER BY quiz_results.quiz_id DESC`
@@ -154,28 +117,23 @@ function readLastEntry() {
     request.on("row", function(columns) { //on the returned row(s)
       columns.forEach(function(column) { //for each of the columns in the row(s)
         // console.log(`${column.metadata.colName}: ${column.value}`); //Print the columnname : value
-        let temp = `${column.metadata.colName}: ${column.value}`;
+        let temp = (`${column.value}`);
         result.push(temp);
       });
     });
 
     connection.execSql(request);
 
-  });
+  }).then((result) => {
 
-  testPromise.then((result) => {
-    
-    
-    // console.log("success in then");
-    console.log(result);
-   
-
+    return result;
   }).catch((err) => {
+
     console.log( err + "error in catch")
   });
 
-  console.log(testPromise);
-  return testPromise;
+
+
 
 }
 
