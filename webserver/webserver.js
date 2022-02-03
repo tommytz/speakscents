@@ -13,6 +13,9 @@ var multer = require('multer');
 var flash = require('connect-flash');
 var ejs = require('ejs');
 var upload = multer();
+var helmet = require('helmet');
+var cookieparser = require('cookie-parser');
+var expSessions = require('express-session');
 var app = express();
 
 //Local modules required
@@ -30,6 +33,20 @@ app.use(upload.array());
 app.use(express.static('public'));
 app.use(flash());
 app.use('/css', express.static(__dirname + '/css'));
+app.use(helmet());
+app.use(cookieparser());
+app.use(expSessions({
+  secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
+  saveUninitialized:true,
+  cookie: { 
+    maxAge: 1800000,
+    secure: true,
+    httpOnly: true,
+    sameSite: 'lax' },
+    resave: false
+}));
+
+var session;
 
 //Changing the engine to ejs, so we can view/embed data in particular way, that can we can then manipulate in express
 //This replaces serving a html file, instead of send file, we use render. Please don't edit, thanks AL
@@ -52,6 +69,11 @@ app.get("/", function (req, res) {
 
   var fileName = "/quiz.html";
   res.sendFile(__dirname + fileName);
+  session = req.session;
+  console.log(session);
+  res.cookie(`Cookie token name`, `Cookie string value`, {
+      
+  });
 });
 
 //This request gets form data from the quiz and stores data in the database
@@ -94,6 +116,12 @@ app.post('/login-submit', function(req,res){
   form.get_json(req.body);
   res.sendFile(__dirname + '/quiz.html');
 
+});
+
+//Logout (forces cookies and session to clear from browser)
+app.get('/logout',(req,res) => {
+  req.session.destroy();
+  res.redirect('/');
 });
 
 //This function returns the saved results from the DB and presents it back to the user
