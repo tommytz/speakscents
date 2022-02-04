@@ -59,15 +59,36 @@ app.get("/", function (req, res) {
 //This request gets form data from the quiz and stores data in the database
 app.post("/quiz-submit", function (req, res) {
 
-  var jsonObject = form.get_json(req.body);
-
-  sql_api.insertToDatabase(jsonObject);
-
-  //Responds client to submission page
-  res.sendFile(__dirname + "/quiz_results.html");
-
+  //async db function handler
+  callerFun(req, res);
 
 });
+
+//store quiz results into db function
+function storeQuizResults(req, res){
+  return new Promise((resolve,reject)=>{
+    //get form quiz results and then insert to db
+    var jsonObject = form.get_json(req.body);
+
+    sql_api.insertToDatabase(jsonObject);
+      setTimeout(()=>{
+          resolve();
+      ;} , 5000
+      );
+  });
+}
+
+//async database function 
+//first waits for data to be inserted and then will run ejs dispay function
+async function callerFun(req, res){
+  console.log("Caller");
+  await storeQuizResults(req, res);
+  console.log("After waiting");
+  //direct to the ejs quiz results page
+  res.redirect('/quiz-results');
+
+}
+
 
 //Registration page
 app.get('/registration', function (req, res) {
@@ -81,7 +102,6 @@ app.post('/registration-submit', function (req, res) {
 
   sql_api.insertToDatabaseRegistration(jsonObject);
 
-  //code for database injection goes here
   res.sendFile(__dirname + '/quiz.html');
 
 });
