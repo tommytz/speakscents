@@ -172,7 +172,6 @@ app.post('/login-submit', function (req, res) {
             var scentMood = quiz_values[4];
             var scentStyles = quiz_values[5];
             
-            console.log("============================");
 
             /* At the moment not redirecting through a get request, this needs to change.
              * Having trouble passing parameters to another route. Instead of res.render should be res.redirect('/profile') with
