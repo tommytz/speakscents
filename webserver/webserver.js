@@ -31,11 +31,7 @@ app.use(express.static('public'));
 app.use(flash());
 app.use('/css', express.static(__dirname + '/css'));
 app.use('/static_scripts', express.static(__dirname + '/static_scripts'));
-
-
-//Changing the engine to ejs, so we can view/embed data in particular way, that can we can then manipulate in express
-//This replaces serving a html file, instead of send file, we use render. Please don't edit, thanks AL
-app.set('view engine', 'ejs');
+app.set('view engine', 'ejs'); //Changing the engine to ejs, so we can view/embed data in particular way
 
 //Server creation and listening on port number. This is called automatically when this module is initialised
 app.listen(port, () => {
@@ -111,6 +107,11 @@ app.get('/login', function (req, res) {
   res.sendFile(__dirname + '/login.html');
 });
 
+app.get('/account', function (req, res) {
+  
+  res.render("account");
+});
+
 //login details submit
 //TODO don't yet have login verification
 app.post('/login-submit', function (req, res) {
@@ -120,22 +121,20 @@ app.post('/login-submit', function (req, res) {
 
 });
 
-//This function returns the saved results from the DB and presents it back to the user
-// WORK IN PROGRESS 02/02/2022 11:39am
+//This function returns the saved results from the DB and presents it back to the user.
 app.get('/quiz-results', function (req, res) {
 
-  //Data from sql
+  //Obatining data from database. Async function, returns promise.
   var data = sql_api.readQuizEntry();
   var values = [];
 
+  //Async chaining functions.
   data.then((result) => {
     // console.log(result);
     for (var i in result) {
       values.push(result[i]);
     }
   }).then(() => {
-    console.log("=================================");
-    console.log(values);
 
     var suggestions = values[0];
     var time = values[1];
@@ -152,7 +151,5 @@ app.get('/quiz-results', function (req, res) {
       scentMood: scentMood,
       scentStyles: scentStyles
     });
-
   });
-
 });
