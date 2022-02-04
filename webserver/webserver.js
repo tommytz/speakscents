@@ -107,6 +107,11 @@ app.get('/login', function (req, res) {
   res.sendFile(__dirname + '/login.html');
 });
 
+app.get('/account', function (req, res) {
+  
+  res.render("account");
+});
+
 //login details submit
 //TODO don't yet have login verification
 app.post('/login-submit', function (req, res) {
