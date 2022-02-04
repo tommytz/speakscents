@@ -209,4 +209,42 @@ const generateQuizParams = function (quiz_answers) {
   return params_string;
 };
 
-module.exports = { connect2DB, insertToDatabase, queryFromDatabase, readQuizEntry, insertToDatabaseRegistration };
+// Retrieves final row from customer DB and returns to quiz results page
+function readLogin(email) {
+
+  return queryPromise = new Promise((resolve, reject) => {
+
+    var result = [];
+    let sql = `SELECT *  FROM [dbo].[user_accounts]
+    WHERE email='cralphs@hotmail.com';`;
+
+    const request = new Request(sql, (err) => {
+      if (err) {
+
+        reject();
+      } else {
+
+        resolve(result);
+      }
+    });
+
+    request.on("row", function (columns) { //on the returned row(s)
+      columns.forEach(function (column) { //for each of the columns in the row(s)
+        // console.log(`${column.metadata.colName}: ${column.value}`); //Print the columnname : value
+        let temp = (`${column.value}`);
+        result.push(temp);
+      });
+    });
+
+    connection.execSql(request);
+
+  }).then((result) => {
+
+    return result;
+  }).catch((err) => {
+
+    console.log(err + "error in catch");
+  });
+}
+
+module.exports = { connect2DB, insertToDatabase, queryFromDatabase, readQuizEntry, insertToDatabaseRegistration, readLogin };

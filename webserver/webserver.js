@@ -60,7 +60,7 @@ app.get("/", function (req, res) {
 app.post("/quiz-submit", function (req, res) {
 
   //async db function handler
-  callerFun(req, res);
+  callerFunQuizResults(req, res);
 
 });
 
@@ -80,7 +80,7 @@ function storeQuizResults(req, res){
 
 //async database function 
 //first waits for data to be inserted and then will run ejs dispay function
-async function callerFun(req, res){
+async function callerFunQuizResults(req, res){
   console.log("Caller");
   await storeQuizResults(req, res);
   console.log("After waiting");
@@ -115,10 +115,58 @@ app.get('/login', function (req, res) {
 //TODO don't yet have login verification
 app.post('/login-submit', function (req, res) {
 
-  form.get_json(req.body);
-  res.sendFile(__dirname + '/quiz.html');
+
+  var unparsedJSON = form.get_json(req.body);
+
+console.log(unparsedJSON);
+
+  var answer_array = [];
+  for (data in unparsedJSON) {
+    let temp = unparsedJSON[data];
+    if (temp instanceof Array) {
+      temp = JSON.stringify(temp);
+    }
+    answer_array.push(temp);
+  }
+  console.log(answer_array);
+
+  var email = answer_array[0];
+  var enteredPassword = answer_array[1];
+  console.log("password" + enteredPassword);
+
+  //Data from sql
+  var data = sql_api.readLogin(email);
+  var values = [];
+
+  data.then((result) => {
+    // console.log(result);
+    for (var i in result) {
+      values.push(result[i]);
+    }
+  }).then(() => {
+    console.log("=================================");
+    console.log(values);
+
+    var custid = values[0];
+    var name = values[1];
+    var password = values[2];
+    var email = values[3];
+
+    if(password===enteredPassword){
+    res.render("login_success", {
+      name: name,
+      email: email,
+     
+    });
+  }
+  else{
+    res.redirect('/registration');
+  }
+  });
 
 });
+
+
 
 //This function returns the saved results from the DB and presents it back to the user
 // WORK IN PROGRESS 02/02/2022 11:39am
@@ -151,6 +199,36 @@ app.get('/quiz-results', function (req, res) {
       scentStrength: scentStrength,
       scentMood: scentMood,
       scentStyles: scentStyles
+    });
+
+  });
+
+});
+
+app.get('/login-validation', function( req, res, email, password){
+
+  //Data from sql
+  var data = sql_api.readLogin(email);
+  var values = [];
+
+  data.then((result) => {
+    // console.log(result);
+    for (var i in result) {
+      values.push(result[i]);
+    }
+  }).then(() => {
+    console.log("=================================");
+    console.log(values);
+
+    var custid = values[0];
+    var name = values[1];
+    var password = values[2];
+    var email = values[3];
+
+    res.render("login_success", {
+      name: name,
+      email: email,
+     
     });
 
   });
