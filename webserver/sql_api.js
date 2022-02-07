@@ -54,16 +54,9 @@ const connect2DB = function () {
 };
 
 //This uploads data from the webserver to the customer database
-const insertToDatabase = function (unparsedJSON) {
+const insertToDatabase = function (jsonData) {
   console.log("Inserting into Table...");
-  var answer_array = [];
-  for (data in unparsedJSON) {
-    let temp = unparsedJSON[data];
-    if (temp instanceof Array) {
-      temp = JSON.stringify(temp);
-    }
-    answer_array.push(temp);
-  }
+  let answer_array = validateJSONPost(jsonData);
   console.log(answer_array);
 
   // Constructing the request for the insert query
@@ -186,7 +179,7 @@ const insertToDatabaseRegistration = function (unparsedJSON) {
 };
 
 // Dynamically constructing the columns to insert into for SQL query string
-const generateQuizCols = function (quiz_answers) {
+function generateQuizCols(quiz_answers) {
   let cols = [];
   for (var i = 0; i < quiz_answers.length; i++) {
     cols.push(`question_${i + 1}`);
@@ -197,7 +190,7 @@ const generateQuizCols = function (quiz_answers) {
 };
 
 // Dynamically constructing the parameterised values for the SQL query
-const generateQuizParams = function (quiz_answers) {
+function generateQuizParams(quiz_answers) {
   let params = [];
   for (var i = 0; i < quiz_answers.length; i++) {
     params.push(`@q${i + 1}`);
@@ -206,6 +199,29 @@ const generateQuizParams = function (quiz_answers) {
   params_string += ")";
   return params_string;
 };
+
+function validateJSONPost(unparsedJSON) {
+  let key_array = ["scent_suggestions", "day_or_night", "season", "gender", "moods", "scent_styles"];
+  let json_array = [];
+
+  // Add null values to any missing keys
+  key_array.forEach(key => {
+    if (!unparsedJSON.hasOwnProperty(key)) {
+      unparsedJSON[key] = "NULL";
+    }
+  });
+
+  // Add JSON data to array in correct key order
+  key_array.forEach(key => {
+    let temp = unparsedJSON[key];
+    if (temp instanceof Array) {
+      temp = JSON.stringify(temp);
+    }
+    json_array.push(temp);
+  });
+  return json_array;
+}
+
 
 // Retrieves final row from customer DB and returns to quiz results page
 function readLogin(email) {
