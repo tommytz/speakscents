@@ -47,12 +47,16 @@ ul {
 }
 
 fieldset{
-    background-color: #f1f1f1;
+    background-color: rgb(255, 211, 169);
     border: none;
     border-radius: 2px;
     margin-bottom: 12px;
     overflow: hidden;
     padding: 0 .625em;
+}
+
+legend{
+  font-size: inherit;
 }
 
 input{

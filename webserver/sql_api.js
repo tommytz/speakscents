@@ -56,7 +56,7 @@ const connect2DB = function () {
 //This uploads data from the webserver to the customer database
 const insertToDatabase = function (jsonData) {
   console.log("Inserting into Table...");
-  let answer_array = parseJSON2Array(jsonData);
+  let answer_array = validateJSONPost(jsonData);
   console.log(answer_array);
 
   // Constructing the request for the insert query
@@ -200,7 +200,7 @@ function generateQuizParams(quiz_answers) {
   return params_string;
 };
 
-function parseJSON2Array(unparsedJSON) {
+function validateJSONPost(unparsedJSON) {
   let key_array = ["scent_suggestions", "day_or_night", "season", "gender", "moods", "scent_styles"];
   let json_array = [];
 
