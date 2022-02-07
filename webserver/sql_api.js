@@ -214,7 +214,7 @@ function readLogin(email) {
 
     var result = [];
     let sql = `SELECT *  FROM [dbo].[user_accounts]
-    WHERE email='cralphs@hotmail.com';`;
+    WHERE email=`+ email +`;`;
 
     const request = new Request(sql, (err) => {
       if (err) {
