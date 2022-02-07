@@ -201,18 +201,24 @@ function generateQuizParams(quiz_answers) {
 };
 
 function parseJSON2Array(unparsedJSON) {
+  let key_array = ["scent_suggestions", "day_or_night", "season", "gender", "moods", "scent_styles"];
   let json_array = [];
-  for (data in unparsedJSON) {
-    let temp = unparsedJSON[data];
+
+  // Add null values to any missing keys
+  key_array.forEach(key => {
+    if (!unparsedJSON.hasOwnProperty(key)) {
+      unparsedJSON[key] = "NULL";
+    }
+  });
+
+  // Add JSON data to array in correct key order
+  key_array.forEach(key => {
+    let temp = unparsedJSON[key];
     if (temp instanceof Array) {
-      if (temp[0] === "null") {
-        temp = "NULL";
-      } else {
-        temp = JSON.stringify(temp);
-      }
+      temp = JSON.stringify(temp);
     }
     json_array.push(temp);
-  }
+  });
   return json_array;
 }
 

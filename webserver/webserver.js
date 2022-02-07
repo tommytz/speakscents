@@ -34,7 +34,6 @@ app.use(flash());
 //   next();
 // });
 app.use('/css', express.static(__dirname + '/css'));
-app.use('/static_scripts', express.static(__dirname + '/static_scripts'));
 app.set('view engine', 'ejs'); //Changing the engine to ejs, so we can view/embed data in particular way
 
 //Server creation and listening on port number. This is called automatically when this module is initialised
@@ -65,22 +64,23 @@ app.post("/quiz-submit", function (req, res) {
 });
 
 //store quiz results into db function
-function storeQuizResults(req, res){
-  return new Promise((resolve,reject)=>{
+function storeQuizResults(req, res) {
+  return new Promise((resolve, reject) => {
     //get form quiz results and then insert to db
     var jsonObject = form.get_json(req.body);
 
     sql_api.insertToDatabase(jsonObject);
-      setTimeout(()=>{
-          resolve();
-      ;} , 5000
-      );
+    setTimeout(() => {
+      resolve();
+      ;
+    }, 5000
+    );
   });
 }
 
 //async database function 
 //first waits for data to be inserted and then will run ejs dispay function
-async function callerFunQuizResults(req, res){
+async function callerFunQuizResults(req, res) {
   console.log("Caller");
   await storeQuizResults(req, res);
   console.log("After waiting");
@@ -121,9 +121,9 @@ app.post('/login-submit', function (req, res) {
   let unparsedJSON = form.get_json(req.body);
   let login_details = [];
 
-  for(let data in unparsedJSON){
+  for (let data in unparsedJSON) {
     let temp = unparsedJSON[data];
-    
+
     if (temp instanceof Array) {
       temp = JSON.stringify(temp);
     }
@@ -141,60 +141,60 @@ app.post('/login-submit', function (req, res) {
   let customer_values = [];
 
   data.then((result) => {
-    
+
     for (var i in result) {
       customer_values.push(result[i]);
-  
+
     }
   }).then(() => {
-      // var custid = customer_values[0];
-      var name = customer_values[1];
-      var password = customer_values[2];
-      var email = customer_values[3];
+    // var custid = customer_values[0];
+    var name = customer_values[1];
+    var password = customer_values[2];
+    var email = customer_values[3];
 
-      if(password === enteredPassword){
-        
-        var quiz_data = sql_api.readQuizEntry();
-        var quiz_values = [];
-      
-        //Async chaining functions.
-        quiz_data.then((result) => {
-        
-          for (var i in result) {
-            quiz_values.push(result[i]);
-          }
-      
-        }).then(() => {
-            var suggestions = quiz_values[0];
-            var time = quiz_values[1];
-            var season = quiz_values[2];
-            var scentStrength = quiz_values[3];
-            var scentMood = quiz_values[4];
-            var scentStyles = quiz_values[5];
-            
+    if (password === enteredPassword) {
 
-            /* At the moment not redirecting through a get request, this needs to change.
-             * Having trouble passing parameters to another route. Instead of res.render should be res.redirect('/profile') with
-             * all the paramaters. AdL
-             * */
-            res.render("profile", {
-                name: name,
-                email: email,
-                suggestions: suggestions,
-                time: time,
-                season: season,
-                scentStrength: scentStrength,
-                scentMood: scentMood,
-                scentStyles: scentStyles
-              
-              }
-            );
-            
-          })
-      }else{
+      var quiz_data = sql_api.readQuizEntry();
+      var quiz_values = [];
+
+      //Async chaining functions.
+      quiz_data.then((result) => {
+
+        for (var i in result) {
+          quiz_values.push(result[i]);
+        }
+
+      }).then(() => {
+        var suggestions = quiz_values[0];
+        var time = quiz_values[1];
+        var season = quiz_values[2];
+        var scentStrength = quiz_values[3];
+        var scentMood = quiz_values[4];
+        var scentStyles = quiz_values[5];
+
+
+        /* At the moment not redirecting through a get request, this needs to change.
+         * Having trouble passing parameters to another route. Instead of res.render should be res.redirect('/profile') with
+         * all the paramaters. AdL
+         * */
+        res.render("profile", {
+          name: name,
+          email: email,
+          suggestions: suggestions,
+          time: time,
+          season: season,
+          scentStrength: scentStrength,
+          scentMood: scentMood,
+          scentStyles: scentStyles
+
+        }
+        );
+
+      });
+    } else {
       res.redirect('/registration');
-      }
-    
+    }
+
   });
 
 });

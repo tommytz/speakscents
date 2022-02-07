@@ -33,8 +33,7 @@
 
     <div id="form">
       <h1>Find Your Match</h1>
-      <!-- <form id="quiz" method="post" action="quiz-submit"> -->
-      <form id="quiz">
+      <form id="quiz" method="post" action="quiz-submit">
         <ol>
           <li class="quiz_list">
             <label for="recommended_scents_title">What scents do you like or do your friends recommend?</label>
@@ -44,21 +43,18 @@
           <li class="quiz_list">
             <fieldset>
               <legend>When would you like to wear your fragrance?</legend>
-              <!-- <label for="night_or_day">When do you want to wear this?</label> -->
+
               <input type="radio" id="day_answer" name="day_or_night" value="day">
               <label for="day">Day</label><br />
 
               <input type="radio" id="night_answer" name="day_or_night" value="night">
               <label for="night">Night</label>
-
-              <input type="hidden" name="day_or_night" value="null">
             </fieldset>
           </li>
 
           <li class="quiz_list">
             <fieldset>
               <legend>Do you prefer to wear your fragrance during any particular season?</legend>
-              <!-- <label for="seasonal">When do you want to wear this?</label> -->
 
               <input type="radio" id="season_summer" name="season" value="summer">
               <label for="summer">Summer</label><br />
@@ -71,15 +67,12 @@
 
               <input type="radio" id="season_spring" name="season" value="spring">
               <label for="spring">Spring</label>
-
-              <input type="hidden" name="season" value="null">
             </fieldset>
           </li>
 
           <li class="quiz_list">
             <fieldset>
               <legend>Do you prefer more...</legend>
-              <!-- <label for="gender_scent">Do you want a more masculine or feminine scent?</label> -->
 
               <input type="radio" id="strength_masculine" name="gender" value="masculine">
               <label for="masculine">Masculine scents</label><br />
@@ -89,15 +82,13 @@
 
               <input type="radio" id="strength_feminine" name="gender" value="feminine">
               <label for="no_pref">Feminine scents</label>
-
-              <input type="hidden" name="gender" value="null">
             </fieldset>
           </li>
 
           <li class="quiz_list">
             <fieldset>
               <legend>How would you like to feel while wearing your fragrance?</legend>
-              <!-- <label for="mood">How would you like to feel while wearing your fragrance?</label> -->
+
               <input type="checkbox" name="moods" id="classic_mood" value="classic">
               <label for="classic">Classic</label><br />
 
@@ -115,15 +106,13 @@
 
               <input type="checkbox" name="moods" id="cool_mood" value="cool">
               <label for="cool">Cool</label>
-
-              <input type="hidden" name="moods" value="null">
             </fieldset>
           </li>
 
           <li class="quiz_list">
             <fieldset>
               <legend>What kind of scents would you like to wear...</legend>
-              <!-- <label for="scent_types">Would you wear...</label> -->
+
               <input type="checkbox" name="scent_styles" id="floral_scent" value="floral">
               <label for="floral">Floral</label><br />
 
@@ -141,9 +130,6 @@
 
               <input type="checkbox" name="scent_styles" id="aquatic_scent" value="aquatic">
               <label for="aquatic">Aquatic</label>
-
-              <input type="hidden" name="scent_styles" value="null">
-
             </fieldset>
           </li>
         </ol>
@@ -152,7 +138,6 @@
       </form>
 
     </div>
-    <script src="static_scripts/format_quiz_data.js"></script>
   </body>
 
 </html>
