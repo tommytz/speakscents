@@ -91,14 +91,14 @@ app.get('/registration', function (req, res) {
   res.sendFile(__dirname + '/registration.html');
 });
 
-//Submit registered data and returns them to the quiz.html page
+//Submit registered data and returns them to the login.html page
 app.post('/registration-submit', function (req, res) {
 
   var jsonObject = form.get_json(req.body);
 
   sql_api.insertToDatabaseRegistration(jsonObject);
 
-  res.sendFile(__dirname + '/quiz.html');
+  res.sendFile(__dirname + '/login.html');
 
 });
 
@@ -107,13 +107,13 @@ app.get('/login', function (req, res) {
   res.sendFile(__dirname + '/login.html');
 });
 
+//account page
 app.get('/account', function (req, res) {
   
   res.render("account");
 });
 
 //login details submit
-//TODO don't yet have login verification
 app.post('/login-submit', function (req, res) {
 
 
@@ -153,17 +153,49 @@ console.log(unparsedJSON);
     var password = values[2];
     var email = values[3];
 
+    //Obatining data from database. Async function, returns promise.
+  var dataQuiz = sql_api.readQuizEntry();
+  var valuesQuiz = [];
+
+  //Async chaining functions.
+  dataQuiz.then((result) => {
+    // console.log(result);
+    for (var i in result) {
+      valuesQuiz.push(result[i]);
+    }
+  }).then(() => {
+
+    var suggestions = values[0];
+    var time = values[1];
+    var season = values[2];
+    var scentStrength = values[3];
+    var scentMood = values[4];
+    var scentStyles = values[5];
+  
+    //render account page instead
     if(password===enteredPassword){
-    res.render("login_success", {
+    res.render("account", {
       name: name,
       email: email,
+
+      suggestions: suggestions,
+      time: time,
+      season: season,
+      scentStrength: scentStrength,
+      scentMood: scentMood,
+      scentStyles: scentStyles
      
     });
+
+    
+
   }
   else{
     res.redirect('/registration');
   }
   });
+
+});
 
 });
 
