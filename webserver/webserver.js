@@ -73,7 +73,7 @@ function storeQuizResults(req, res) {
     setTimeout(() => {
       resolve();
       ;
-    }, 5000
+    }, 500
     );
   });
 }
@@ -156,6 +156,7 @@ app.post('/login-submit', function (req, res) {
 
       var quiz_data = sql_api.readQuizEntry();
       var quiz_values = [];
+      console.log(quiz_data);
 
       //Async chaining functions.
       quiz_data.then((result) => {
