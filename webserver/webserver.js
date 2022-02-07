@@ -29,8 +29,11 @@ app.use(bodyParser.json());
 app.use(upload.array());
 app.use(express.static('public'));
 app.use(flash());
+// app.use(function (req, res, next) { //Needed for connect-flash and session data, please leave for now AdL.
+//   res.locals.messages = require('express-messages')(req, res);
+//   next();
+// });
 app.use('/css', express.static(__dirname + '/css'));
-app.use('/static_scripts', express.static(__dirname + '/static_scripts'));
 app.set('view engine', 'ejs'); //Changing the engine to ejs, so we can view/embed data in particular way
 
 //Server creation and listening on port number. This is called automatically when this module is initialised
@@ -61,22 +64,23 @@ app.post("/quiz-submit", function (req, res) {
 });
 
 //store quiz results into db function
-function storeQuizResults(req, res){
-  return new Promise((resolve,reject)=>{
+function storeQuizResults(req, res) {
+  return new Promise((resolve, reject) => {
     //get form quiz results and then insert to db
     var jsonObject = form.get_json(req.body);
 
     sql_api.insertToDatabase(jsonObject);
-      setTimeout(()=>{
-          resolve();
-      ;} , 5000
-      );
+    setTimeout(() => {
+      resolve();
+      ;
+    }, 5000
+    );
   });
 }
 
 //async database function 
 //first waits for data to be inserted and then will run ejs dispay function
-async function callerFunQuizResults(req, res){
+async function callerFunQuizResults(req, res) {
   console.log("Caller");
   await storeQuizResults(req, res);
   console.log("After waiting");
@@ -91,111 +95,107 @@ app.get('/registration', function (req, res) {
   res.sendFile(__dirname + '/registration.html');
 });
 
-//Submit registered data and returns them to the login.html page
+//Submit registered data and returns them to the quiz.html page
 app.post('/registration-submit', function (req, res) {
 
   var jsonObject = form.get_json(req.body);
 
   sql_api.insertToDatabaseRegistration(jsonObject);
 
-  res.sendFile(__dirname + '/login.html');
+  res.sendFile(__dirname + '/quiz.html');
 
 });
 
 //login page
 app.get('/login', function (req, res) {
-  res.sendFile(__dirname + '/login.html');
-});
-
-//account page
-app.get('/account', function (req, res) {
-  
-  res.render("account");
+  console.log("ejs login");
+  res.render('login');
 });
 
 //login details submit
+//TODO: Clean up, so ugly and not dynamic :((( AdL
 app.post('/login-submit', function (req, res) {
 
+  //We can probably move this to the form-reader module >>>>>
+  //Retrieving login details
+  let unparsedJSON = form.get_json(req.body);
+  let login_details = [];
 
-  var unparsedJSON = form.get_json(req.body);
-
-console.log(unparsedJSON);
-
-  var answer_array = [];
-  for (data in unparsedJSON) {
+  for (let data in unparsedJSON) {
     let temp = unparsedJSON[data];
+
     if (temp instanceof Array) {
       temp = JSON.stringify(temp);
     }
-    answer_array.push(temp);
+
+    login_details.push(temp);
   }
-  console.log(answer_array);
 
-  var email = answer_array[0];
-  var enteredPassword = answer_array[1];
-  console.log("password" + enteredPassword);
+  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+  //Assigning login details
+  let email = login_details[0];
+  let enteredPassword = login_details[1];
 
-  //Data from sql
-  var data = sql_api.readLogin(email);
-  var values = [];
+  //Reading login data from SQL
+  let data = sql_api.readLogin(email);
+  let customer_values = [];
 
   data.then((result) => {
-    // console.log(result);
+
     for (var i in result) {
-      values.push(result[i]);
+      customer_values.push(result[i]);
+
     }
   }).then(() => {
-    console.log("=================================");
-    console.log(values);
+    // var custid = customer_values[0];
+    var name = customer_values[1];
+    var password = customer_values[2];
+    var email = customer_values[3];
 
-    var custid = values[0];
-    var name = values[1];
-    var password = values[2];
-    var email = values[3];
+    if (password === enteredPassword) {
 
-    //Obatining data from database. Async function, returns promise.
-  var dataQuiz = sql_api.readQuizEntry();
-  var valuesQuiz = [];
+      var quiz_data = sql_api.readQuizEntry();
+      var quiz_values = [];
 
-  //Async chaining functions.
-  dataQuiz.then((result) => {
-    // console.log(result);
-    for (var i in result) {
-      valuesQuiz.push(result[i]);
+      //Async chaining functions.
+      quiz_data.then((result) => {
+
+        for (var i in result) {
+          quiz_values.push(result[i]);
+        }
+
+      }).then(() => {
+        var suggestions = quiz_values[0];
+        var time = quiz_values[1];
+        var season = quiz_values[2];
+        var scentStrength = quiz_values[3];
+        var scentMood = quiz_values[4];
+        var scentStyles = quiz_values[5];
+
+
+        /* At the moment not redirecting through a get request, this needs to change.
+         * Having trouble passing parameters to another route. Instead of res.render should be res.redirect('/profile') with
+         * all the paramaters. AdL
+         * */
+        res.render("profile", {
+          name: name,
+          email: email,
+          suggestions: suggestions,
+          time: time,
+          season: season,
+          scentStrength: scentStrength,
+          scentMood: scentMood,
+          scentStyles: scentStyles
+
+        }
+        );
+
+      });
+    } else {
+      res.redirect('/registration');
     }
-  }).then(() => {
 
-    var suggestions = values[0];
-    var time = values[1];
-    var season = values[2];
-    var scentStrength = values[3];
-    var scentMood = values[4];
-    var scentStyles = values[5];
-  
-    //render account page instead
-    if(password===enteredPassword){
-    res.render("account", {
-      name: name,
-      email: email,
-
-      suggestions: suggestions,
-      time: time,
-      season: season,
-      scentStrength: scentStrength,
-      scentMood: scentMood,
-      scentStyles: scentStyles
-     
-    });
-
-    
-
-  }
-  else{
-    res.redirect('/registration');
-  }
   });
-
-});
 
 });
 

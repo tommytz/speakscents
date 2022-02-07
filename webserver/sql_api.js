@@ -82,9 +82,7 @@ const insertToDatabase = function (unparsedJSON) {
     });
 
   for (var i = 0; i < answer_array.length; i++) {
-    let qi = answer_array[i];
-    request.addParameter(`q${i + 1}`, TYPES.VarChar, qi);
-    console.log("answer " + (i + 1) + ": " + qi + " ==> " + `q${i + 1}`);
+    request.addParameter(`q${i + 1}`, TYPES.VarChar, answer_array[i]);
   }
   connection.execSql(request);
 };

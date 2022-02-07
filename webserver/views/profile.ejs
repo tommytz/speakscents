@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- bootstrap style import -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@200&display=swap');
+        </style>
+      <!-- general style settings -->
+      <link rel="stylesheet" href="/css/style.css"> 
+    
+    <title>Login Successful</title>
+</head>
+<body>
+  <h1>Your Details</h1>
+  <h2>Name </h2>
+  <p><%= name %></p>
+  <h2>Email </h2>
+  <p><%= email %></p>
+
+  <h1>Your Quiz Results</h1>
+  <h2>Suggested Scents</h2>
+  <p><%= suggestions %></p>
+  <h2>Preferred when to wear: </h2>
+  <p><%= time %></p>
+  <h2>Preferred season to wear:</h2>
+  <p><%=season %></p>
+  <h2>Preferred scent strength: </h2>
+  <p><%= scentStrength %></p>
+  <h2>Preferred scent mood: </h2>
+  <p><%= scentMood %></p>
+  <h2>Preferred scent style:</h2>
+  <p><%= scentStyles %></p>
+
+  <br>
+  <button>Retake Quiz</button>
+
+</body>
+</html>
