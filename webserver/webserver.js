@@ -36,7 +36,7 @@ app.use('/css', express.static(__dirname + '/css'));
 app.use(helmet());
 app.use(cookieparser());
 app.use(expSessions({
-  secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
+  secret: "thisismysecretkeyfhrgfgrfrty84fwir767",
   saveUninitialized:true,
   cookie: { 
     maxAge: 1800000,
