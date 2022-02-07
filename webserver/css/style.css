@@ -8,6 +8,10 @@ h2 {
     font-family: 'Kanit', sans-serif;
 }
 
+p{
+    font-family: 'Kanit', sans-serif;
+}
+
 button:hover {
     opacity: 0.8;
   }
