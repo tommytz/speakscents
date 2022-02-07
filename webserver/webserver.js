@@ -32,6 +32,10 @@ app.use(bodyParser.json());
 app.use(upload.array());
 app.use(express.static('public'));
 app.use(flash());
+// app.use(function (req, res, next) { //Needed for connect-flash and session data, please leave for now AdL.
+//   res.locals.messages = require('express-messages')(req, res);
+//   next();
+// });
 app.use('/css', express.static(__dirname + '/css'));
 app.use(helmet());
 app.use(cookieparser());
@@ -79,15 +83,37 @@ app.get("/", function (req, res) {
 //This request gets form data from the quiz and stores data in the database
 app.post("/quiz-submit", function (req, res) {
 
-  var jsonObject = form.get_json(req.body);
+  //async db function handler
+  callerFunQuizResults(req, res);
 
-  sql_api.insertToDatabase(jsonObject);
-
-  //Responds client to submission page
-  res.sendFile(__dirname + "/quiz_results.html");
-
- 
 });
+
+//store quiz results into db function
+function storeQuizResults(req, res) {
+  return new Promise((resolve, reject) => {
+    //get form quiz results and then insert to db
+    var jsonObject = form.get_json(req.body);
+
+    sql_api.insertToDatabase(jsonObject);
+    setTimeout(() => {
+      resolve();
+      ;
+    }, 5000
+    );
+  });
+}
+
+//async database function 
+//first waits for data to be inserted and then will run ejs dispay function
+async function callerFunQuizResults(req, res) {
+  console.log("Caller");
+  await storeQuizResults(req, res);
+  console.log("After waiting");
+  //direct to the ejs quiz results page
+  res.redirect('/quiz-results');
+
+}
+
 
 //Registration page
 app.get('/registration', function (req, res) {
@@ -97,24 +123,104 @@ app.get('/registration', function (req, res) {
 //Submit registered data and returns them to the quiz.html page
 app.post('/registration-submit', function (req, res) {
 
-  form.get_json(req.body);
+  var jsonObject = form.get_json(req.body);
 
-  //code for database injection goes here
+  sql_api.insertToDatabaseRegistration(jsonObject);
+
   res.sendFile(__dirname + '/quiz.html');
 
 });
 
 //login page
 app.get('/login', function (req, res) {
-  res.sendFile(__dirname + '/login.html');
+  console.log("ejs login");
+  res.render('login');
 });
 
 //login details submit
-//TODO don't yet have login verification
-app.post('/login-submit', function(req,res){
+//TODO: Clean up, so ugly and not dynamic :((( AdL
+app.post('/login-submit', function (req, res) {
 
-  form.get_json(req.body);
-  res.sendFile(__dirname + '/quiz.html');
+  //We can probably move this to the form-reader module >>>>>
+  //Retrieving login details
+  let unparsedJSON = form.get_json(req.body);
+  let login_details = [];
+
+  for (let data in unparsedJSON) {
+    let temp = unparsedJSON[data];
+
+    if (temp instanceof Array) {
+      temp = JSON.stringify(temp);
+    }
+
+    login_details.push(temp);
+  }
+
+  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+  //Assigning login details
+  let email = login_details[0];
+  let enteredPassword = login_details[1];
+
+  //Reading login data from SQL
+  let data = sql_api.readLogin(email);
+  let customer_values = [];
+
+  data.then((result) => {
+
+    for (var i in result) {
+      customer_values.push(result[i]);
+
+    }
+  }).then(() => {
+    // var custid = customer_values[0];
+    var name = customer_values[1];
+    var password = customer_values[2];
+    var email = customer_values[3];
+
+    if (password === enteredPassword) {
+
+      var quiz_data = sql_api.readQuizEntry();
+      var quiz_values = [];
+
+      //Async chaining functions.
+      quiz_data.then((result) => {
+
+        for (var i in result) {
+          quiz_values.push(result[i]);
+        }
+
+      }).then(() => {
+        var suggestions = quiz_values[0];
+        var time = quiz_values[1];
+        var season = quiz_values[2];
+        var scentStrength = quiz_values[3];
+        var scentMood = quiz_values[4];
+        var scentStyles = quiz_values[5];
+
+
+        /* At the moment not redirecting through a get request, this needs to change.
+         * Having trouble passing parameters to another route. Instead of res.render should be res.redirect('/profile') with
+         * all the paramaters. AdL
+         * */
+        res.render("profile", {
+          name: name,
+          email: email,
+          suggestions: suggestions,
+          time: time,
+          season: season,
+          scentStrength: scentStrength,
+          scentMood: scentMood,
+          scentStyles: scentStyles
+
+        }
+        );
+
+      });
+    } else {
+      res.redirect('/registration');
+    }
+
+  });
 
 });
 
@@ -128,29 +234,33 @@ app.get('/logout',(req,res) => {
 // WORK IN PROGRESS 02/02/2022 11:39am
 app.get('/quiz-results', function (req, res) {
 
-  //Data from sql
-  var data = sql_api.queryFromDatabase();
-  console.log(typeof data);
-  console.log("From the function call: " + data);
+  //Obatining data from database. Async function, returns promise.
+  var data = sql_api.readQuizEntry();
+  var values = [];
 
-  let html = ejs.render('<%= people.join(", "); %>', {people: people});
+  //Async chaining functions.
+  data.then((result) => {
+    // console.log(result);
+    for (var i in result) {
+      values.push(result[i]);
+    }
+  }).then(() => {
 
-  var suggestions = "hellow";
-  var time = "mate";
-  var season = "what's going on?";
-  var scentStrength = "you ok buddy?";
-  var scentMood = "see ya matey";
-  var scentStyles = "potatey";
+    var suggestions = values[0];
+    var time = values[1];
+    var season = values[2];
+    var scentStrength = values[3];
+    var scentMood = values[4];
+    var scentStyles = values[5];
 
-
-  res.render("quiz_results", {
-    suggestions: suggestions,
-    time: time,
-    season: season,
-    scentStrength: scentStrength,
-    scentMood: scentMood,
-    scentStyles: scentStyles
+    res.render("quiz_results", {
+      suggestions: suggestions,
+      time: time,
+      season: season,
+      scentStrength: scentStrength,
+      scentMood: scentMood,
+      scentStyles: scentStyles
+    });
   });
-
 
 });
