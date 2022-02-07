@@ -16,6 +16,7 @@ var upload = multer();
 var helmet = require('helmet');
 var cookieparser = require('cookie-parser');
 var expSessions = require('express-session');
+const MSSQLStore = require('connect-mssql-v2');
 var app = express();
 
 //Local modules required
@@ -25,6 +26,22 @@ var sql_api = require('./sql_api');
 //Server details
 const { allowedNodeEnvironmentFlags } = require('process');
 var port = 8080;
+
+const username = "Morgan";
+const password = "TestDB0001928";
+const server_name = "speakscents-test-server.database.windows.net";
+const db_name = "test_database";
+
+// Config required for database connection
+const config = {
+  user: username,
+  password: password,
+  server: server_name,
+  database: db_name,
+  options: {
+    encrypt: true
+  }
+};
 
 //Setting node.js for parsing json, multibox forms, css styling
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -40,14 +57,15 @@ app.use('/css', express.static(__dirname + '/css'));
 app.use(helmet());
 app.use(cookieparser());
 app.use(expSessions({
-  secret: "thisismysecretkeyfhrgfgrfrty84fwir767",
-  saveUninitialized:true,
+  store: new MSSQLStore(config),
+  secret: "secret key to sign cookie",
+  saveUninitialized: false,
+  resave: false,
   cookie: { 
     maxAge: 1800000,
     secure: true,
     httpOnly: true,
     sameSite: 'lax' },
-    resave: false
 }));
 
 var session;
