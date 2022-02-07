@@ -9,7 +9,7 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    
+
     <!-- general webpage css -->
     <link rel="stylesheet" href="/css/style.css">
     <!-- specific webpage css -->
@@ -34,7 +34,6 @@
     <div id="form">
       <h1>Find Your Match</h1>
       <form id="quiz" method="post" action="quiz-submit">
-        <!-- <form id="quiz"> -->
         <ol>
           <li class="quiz_list">
             <label for="recommended_scents_title">What scents do you like or do your friends recommend?</label>
@@ -42,114 +41,103 @@
           </li>
 
           <li class="quiz_list">
-            <label for="night_or_day">When do you want to wear this?</label>
-            <div>
+            <fieldset>
+              <legend>When would you like to wear your fragrance?</legend>
+
               <input type="radio" id="day_answer" name="day_or_night" value="day">
-              <label for="day">Day</label>
-            </div>
-            <div>
+              <label for="day">Day</label><br />
+
               <input type="radio" id="night_answer" name="day_or_night" value="night">
               <label for="night">Night</label>
-            </div>
-
+            </fieldset>
           </li>
+
           <li class="quiz_list">
-            <label for="seasonal">When do you want to wear this?</label>
-            <div>
+            <fieldset>
+              <legend>Do you prefer to wear your fragrance during any particular season?</legend>
+
               <input type="radio" id="season_summer" name="season" value="summer">
-              <label for="summer">Summer</label>
-            </div>
-            <div>
+              <label for="summer">Summer</label><br />
+
               <input type="radio" id="season_autumn" name="season" value="autumn">
-              <label for="autumn">Autumn</label>
-            </div>
-            <div>
+              <label for="autumn">Autumn</label><br />
+
               <input type="radio" id="season_winter" name="season" value="winter">
-              <label for="winter">Winter</label>
-            </div>
-            <div>
+              <label for="winter">Winter</label><br />
+
               <input type="radio" id="season_spring" name="season" value="spring">
               <label for="spring">Spring</label>
-            </div>
-
+            </fieldset>
           </li>
+
           <li class="quiz_list">
-            <label for="gender_scent">Do you want a more masculine or feminine scent?</label>
-            <div>
+            <fieldset>
+              <legend>Do you prefer more...</legend>
+
               <input type="radio" id="strength_masculine" name="gender" value="masculine">
-              <label for="masculine">Masculine</label>
-            </div>
-            <div>
-              <input type="radio" id="strength_feminine" name="gender" value="feminine">
-              <label for="feminine">Feminine</label>
-            </div>
-            <div>
+              <label for="masculine">Masculine scents</label><br />
+
               <input type="radio" id="strength_no_pref" name="gender" value="no_gender">
-              <label for="no_pref">No Preference</label>
-            </div>
+              <label for="feminine">Neutral scents</label><br />
+
+              <input type="radio" id="strength_feminine" name="gender" value="feminine">
+              <label for="no_pref">Feminine scents</label>
+            </fieldset>
           </li>
 
           <li class="quiz_list">
-            <label for="mood">How would you like to feel while wearing your fragrance?</label>
-            <div>
+            <fieldset>
+              <legend>How would you like to feel while wearing your fragrance?</legend>
+
               <input type="checkbox" name="moods" id="classic_mood" value="classic">
-              <label for="classic">Classic</label>
-            </div>
-            <div>
+              <label for="classic">Classic</label><br />
+
               <input type="checkbox" name="moods" id="fresh_mood" value="fresh">
-              <label for="fresh">Fresh</label>
-            </div>
-            <div>
+              <label for="fresh">Fresh</label><br />
+
               <input type="checkbox" name="moods" id="modern_mood" value="modern">
-              <label for="modern">Modern</label>
-            </div>
-            <div>
+              <label for="modern">Modern</label><br />
+
               <input type="checkbox" name="moods" id="warm_mood" value="warm">
-              <label for="warm">Warm</label>
-            </div>
-            <div>
+              <label for="warm">Warm</label><br />
+
               <input type="checkbox" name="moods" id="exotic_mood" value="exotic">
-              <label for="exotic">Exotic</label>
-            </div>
-            <div>
+              <label for="exotic">Exotic</label><br />
+
               <input type="checkbox" name="moods" id="cool_mood" value="cool">
               <label for="cool">Cool</label>
-            </div>
+            </fieldset>
           </li>
 
           <li class="quiz_list">
-            <label for="scent_types">Would you wear...</label>
-            <div>
+            <fieldset>
+              <legend>What kind of scents would you like to wear...</legend>
+
               <input type="checkbox" name="scent_styles" id="floral_scent" value="floral">
-              <label for="floral">Floral</label>
-            </div>
-            <div>
+              <label for="floral">Floral</label><br />
+
               <input type="checkbox" name="scent_styles" id="citrus_scent" value="citrus">
-              <label for="citrus">Citrus</label>
-            </div>
-            <div>
+              <label for="citrus">Citrus</label><br />
+
               <input type="checkbox" name="scent_styles" id="woody_scent" value="woody">
-              <label for="woody">Woody</label>
-            </div>
-            <div>
+              <label for="woody">Woody</label><br />
+
               <input type="checkbox" name="scent_styles" id="fruity_scent" value="fruity">
-              <label for="fruity">Fruity</label>
-            </div>
-            <div>
+              <label for="fruity">Fruity</label><br />
+
               <input type="checkbox" name="scent_styles" id="spicy_scent" value="spicy">
-              <label for="spicy">Spicy</label>
-            </div>
-            <div>
+              <label for="spicy">Spicy</label><br />
+
               <input type="checkbox" name="scent_styles" id="aquatic_scent" value="aquatic">
               <label for="aquatic">Aquatic</label>
-            </div>
+            </fieldset>
+          </li>
         </ol>
 
         <button type="submit" id="submit_btn">Submit Form</button>
       </form>
 
     </div>
-    <!-- <script src="static_scripts/format_quiz_data.js"></script> -->
   </body>
 
 </html>
