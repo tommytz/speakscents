@@ -48,17 +48,6 @@ const get_results = function (body) {
   return data_JSON;
 };
 
-
-//
-//Returning straight JSON file of the form data.
-//
-const get_json = function (body) {
-  // console.log(body);
-  return body;
-};
-
-
-
 //
 //This method takes form data and returns an array list of [key,value]
 //
@@ -102,53 +91,37 @@ const get_jsonAsString = function (body) {
 
 };
 
+//Validates login.
+async function valdiateLogin(req, res) {
 
-function getLoginFormDetails(req, res) {
+  let submittedEmail = req.body.email;
+  let submittedPassword = req.body.password;
+  let databaseLogin;
+  let databasePassword;
+  let databaseName;
+  let databaseEmail;
+  let isValid;
 
-  let unparsedJSON = get_json(req.body);
-  let login_details = [];
+  try {
 
-  for (let data in unparsedJSON) {
-    let temp = unparsedJSON[data];
+    databaseLogin = await sql_api.readLogin(submittedEmail);
+    databasePassword = databaseLogin.password;
+    databaseName = databaseLogin.name;
+    databaseEmail = databaseLogin.email;
+    isValid = (submittedPassword === databasePassword);
 
-    if (temp instanceof Array) {
-      temp = JSON.stringify(temp);
-    }
-
-    login_details.push(temp);
+  } catch (error) {
+    console.log(error);
   }
 
-  return login_details;
+  let loginObject = {
+    valid: isValid,
+    name: databaseName,
+    email: databaseEmail
+  };
+
+
+  return loginObject;
 }
 
-//Validates login.
-async function valdiateLogin(req,res){
-  
-    let submittedLogin = getLoginFormDetails(req,res);
-    let submittedEmail = submittedLogin[0];
-    let submittedPassword = submittedLogin[1];
-    let databaseLogin;
-    let databasePassword;
-    let datbaseName;
-    let databaseEmail;
-    let isValid;
-
-    try{
-      
-      databaseLogin = await sql_api.readLogin(submittedEmail);
-      databasePassword = databaseLogin[2];
-      databaseName = databaseLogin[1];
-      databaseEmail = databaseLogin[3];
-      isValid = (submittedPassword === databasePassword);
-
-    } catch (error){
-      console.log(error);
-    }
-
-    let loginArray = [isValid, databaseName, databaseEmail];
-
-
-    return loginArray;
-}
-
-module.exports = { get_json, get_jsonAsList, get_jsonAsListOfValues, get_jsonAsString, get_results, valdiateLogin };
+module.exports = { get_jsonAsList, get_jsonAsListOfValues, get_jsonAsString, get_results, valdiateLogin };

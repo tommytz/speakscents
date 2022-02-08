@@ -125,12 +125,12 @@ app.post('/login-submit', async function (req, res) {
 
   let loginValidation = await form.valdiateLogin(req, res);
 
-  if (loginValidation[2]) {
+  if (loginValidation.valid) {
     // Res page with results
     let quiz_data = await sql_api.readQuizEntry();
     res.render("profile", {
-      name: loginValidation[1],
-      email: loginValidation[2],
+      name: loginValidation.name,
+      email: loginValidation.email,
       suggestions: quiz_data[0],
       time: quiz_data[1],
       season: quiz_data[2],
@@ -146,35 +146,17 @@ app.post('/login-submit', async function (req, res) {
 });
 
 //This function returns the saved results from the DB and presents it back to the user.
-app.get('/quiz-results', function (req, res) {
+app.get('/quiz-results', async function (req, res) {
 
   //Obatining data from database. Async function, returns promise.
-  var data = sql_api.readQuizEntry();
-  var values = [];
-
-  //Async chaining functions.
-  data.then((result) => {
-    // console.log(result);
-    for (var i in result) {
-      values.push(result[i]);
-    }
-  }).then(() => {
-
-    var suggestions = values[0];
-    var time = values[1];
-    var season = values[2];
-    var scentStrength = values[3];
-    var scentMood = values[4];
-    var scentStyles = values[5];
-
-    res.render("quiz_results", {
-      suggestions: suggestions,
-      time: time,
-      season: season,
-      scentStrength: scentStrength,
-      scentMood: scentMood,
-      scentStyles: scentStyles
-    });
+  let quiz_data = await sql_api.readQuizEntry();
+  res.render("profile", {
+    suggestions: quiz_data[0],
+    time: quiz_data[1],
+    season: quiz_data[2],
+    scentStrength: quiz_data[3],
+    scentMood: quiz_data[4],
+    scentStyles: quiz_data[5]
   });
 });
 
