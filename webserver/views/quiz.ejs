@@ -141,13 +141,14 @@
       </form>
 
     </div>
-
+    <% if(!cookieAllowed){%>
     <div id="cookie_popup">
       <p> We use third party cookies to personalize content, ads and analyze site traffic.</p>
       <a href="/acceptCookie"><button type="button" class="btn btn-outline-primary" id="cookie_btn">Accept</button></a>
       <button type="button" class="btn btn-outline-dark" id="deny_cookie_btn">Deny</button>
       
     </div>
+<%}%>
   </body>
 
   <script src="/static_scripts/quiz.js"></script>

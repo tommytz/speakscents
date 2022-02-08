@@ -14,7 +14,8 @@ var flash = require('connect-flash');
 var ejs = require('ejs');
 var upload = multer();
 var app = express();
-var session = require('client-sessions');
+
+var cookieAllowed = false;
 
 //Local modules required
 var form = require('./form-reader.js');
@@ -49,13 +50,6 @@ app.listen(port, () => {
 //Opening connection to database
 sql_api.connect2DB();
 
-//cookie
-app.use(session({
-  cookieName: 'session',
-  secret: 'random_string_goes_here',
-  duration: 30 * 60 * 1000,
-  activeDuration: 5 * 60 * 1000,
-}));
 
 /* *************************************************************************
  * Processing requests from webengine
@@ -65,7 +59,10 @@ app.use(session({
 app.get("/", function (req, res) {
 
   var fileName = "/quiz.html";
-  res.sendFile(__dirname + fileName);
+  // res.sendFile(__dirname + fileName);
+  res.render('quiz',{
+    cookieAllowed: cookieAllowed
+  })
 });
 
 //This request gets form data from the quiz and stores data in the database
@@ -128,8 +125,6 @@ app.post('/login-submit', async function (req, res) {
 
   if (loginValidation.valid) {
 
-    // sets a cookie with the user's info
-    req.session.user = user;
 
     // Res page with results
     let quiz_data = await sql_api.readQuizEntry();
@@ -151,7 +146,7 @@ app.get('/quiz-results', async function (req, res) {
 
   //Obatining data from database. Async function, returns promise.
   let quiz_data = await sql_api.readQuizEntry();
-  res.render("profile", {
+  res.render("quiz_results", {
     suggestions: quiz_data[0],
     time: quiz_data[1],
     season: quiz_data[2],
@@ -164,5 +159,14 @@ app.get('/quiz-results', async function (req, res) {
 //View Shop 
 app.get('/shop', function (req, res) {
   res.render('shop');
+});
+
+//Accept Cookie
+app.get('/acceptCookie', function (req, res) {
+  cookieAllowed = true;
+  console.log("cookie allowed");
+  res.render('quiz', {
+    cookieAllowed: cookieAllowed
+  })
 });
 
