@@ -64,15 +64,14 @@ const insertToDatabase = function (jsonData) {
   var values = `VALUES ('123', 'answer', 'cluster', '1', `;
   query += generateQuizCols(answer_array) + values + generateQuizParams(answer_array);
 
-  const request = new Request(query
-    , (err) => {
-      if (err) {
-        console.log("Unable to insert data");
-        console.error(err.message);
-      } else {
-        console.log("Data inserted");
-      }
-    });
+  const request = new Request(query, (err) => {
+    if (err) {
+      console.log("Unable to insert data");
+      console.error(err.message);
+    } else {
+      console.log("Data inserted");
+    }
+  });
 
   for (var i = 0; i < answer_array.length; i++) {
     request.addParameter(`q${i + 1}`, TYPES.VarChar, answer_array[i]);
@@ -108,20 +107,15 @@ const queryFromDatabase = function () {
 
 // Retrieves final row from customer DB and returns to quiz results page
 function readQuizEntry() {
+  var result = [];
+  let sql = `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM quiz_results ORDER BY quiz_results.quiz_id DESC`;
 
-  return queryPromise = new Promise((resolve, reject) => {
-
-    var result = [];
-    let sql = `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM quiz_results ORDER BY quiz_results.quiz_id DESC`;
-
+  return new Promise((resolve, reject) => {
     const request = new Request(sql, (err) => {
       if (err) {
-
         reject();
-      } else {
-
-        resolve(result);
       }
+      resolve(result);
     });
 
     request.on("row", function (columns) { //on the returned row(s)
@@ -133,13 +127,6 @@ function readQuizEntry() {
     });
 
     connection.execSql(request);
-
-  }).then((result) => {
-
-    return result;
-  }).catch((err) => {
-
-    console.log(err + "error in catch");
   });
 }
 
@@ -219,45 +206,32 @@ function validateJSONPost(unparsedJSON) {
     }
     json_array.push(temp);
   });
+
   return json_array;
 }
 
 
-// Retrieves final row from customer DB and returns to quiz results page
+//Retrieves final row from customer DB and returns to profile page
 function readLogin(email) {
+  let account_values = {};
+  let sql = `SELECT *  FROM [dbo].[user_accounts]
+  WHERE email='`+ email + `';`;
 
-  return queryPromise = new Promise((resolve, reject) => {
-
-    var result = [];
-    let sql = `SELECT *  FROM [dbo].[user_accounts]
-    WHERE email=`+ email +`;`;
-
+  return new Promise((resolve, reject) => {
     const request = new Request(sql, (err) => {
       if (err) {
-
-        reject();
-      } else {
-
-        resolve(result);
+        reject(err);
       }
+      resolve(account_values);
     });
 
     request.on("row", function (columns) { //on the returned row(s)
       columns.forEach(function (column) { //for each of the columns in the row(s)
-        // console.log(`${column.metadata.colName}: ${column.value}`); //Print the columnname : value
-        let temp = (`${column.value}`);
-        result.push(temp);
+        account_values[column.metadata.colName] = column.value;
       });
     });
 
     connection.execSql(request);
-
-  }).then((result) => {
-
-    return result;
-  }).catch((err) => {
-
-    console.log(err + "error in catch");
   });
 }
 

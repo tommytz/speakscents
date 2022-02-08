@@ -13,13 +13,7 @@
     overflow-x: hidden;
     padding-top: 20px;
 }
-h1 {
-    font-family: 'Kanit', sans-serif;
-}
 
-h2 {
-    font-family: 'Kanit', sans-serif;
-}
 
 .main {
     padding: 0px 10px;
@@ -72,9 +66,7 @@ button{
     color: #fff;
 }
 
-.login-main-text h2{
-    font-weight: 300;
-}
+
 
 .btn-black{
     background-color: #000 !important;

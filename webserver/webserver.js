@@ -20,13 +20,17 @@ var MSSQLStore = require('connect-mssql-v2');
 var mssql = require('mssql');
 var app = express();
 
+var cookieAllowed = false;
+
 //Local modules required
 var form = require('./form-reader.js');
 var sql_api = require('./sql_api');
 
 //Server details
 const { allowedNodeEnvironmentFlags } = require('process');
+const { resolve } = require('path');
 var port = 8080;
+const key_array = ["suggestions", "time", "season", "scentStrength", "scentMood", "scentStyles"];
 
 //Setting node.js for parsing json, multibox forms, css styling
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -39,17 +43,23 @@ app.use(flash());
 //   next();
 // });
 app.use('/css', express.static(__dirname + '/css'));
+app.use('/static_scripts', express.static(__dirname + '/static_scripts'));
+
+//Changing the engine to ejs, so we can view/embed data in particular way, that can we can then manipulate in express
+//This replaces serving a html file, instead of send file, we use render. Please don't edit, thanks AL
+app.set('view engine', 'ejs');
+
 app.use(helmet());
 app.use(cookieparser());
 var options = {
   user: 'Morgan',
   password: 'TestDB0001928',
-	database: 'test_database',
+  database: 'test_database',
   server: "speakscents-test-server.database.windows.net",
   port: 1433,
   options: {
     trustServerCertificate: true,
-    encrypt : true,
+    encrypt: true,
     table: 'sessions'
   }
 };
@@ -58,7 +68,7 @@ console.log(connection);
 var sessionStore = new MSSQLStore(options, connection);
 
 sessionStore.on('connect', () => {
-	console.log('here')
+  console.log('here');
 });
 
 //console.log(sessionStore);
@@ -67,18 +77,15 @@ app.use(expSessions({
   saveUninitialized: true,
   resave: false,
   store: sessionStore,
-  cookie: { 
+  cookie: {
     maxAge: 1800000,
     secure: true,
     httpOnly: true,
-    sameSite: 'lax' },
+    sameSite: 'lax'
+  },
 }));
 
 var session;
-
-//Changing the engine to ejs, so we can view/embed data in particular way, that can we can then manipulate in express
-//This replaces serving a html file, instead of send file, we use render. Please don't edit, thanks AL
-app.set('view engine', 'ejs');
 
 //Server creation and listening on port number. This is called automatically when this module is initialised
 app.listen(port, () => {
@@ -88,6 +95,7 @@ app.listen(port, () => {
 //Opening connection to database
 sql_api.connect2DB();
 
+
 /* *************************************************************************
  * Processing requests from webengine
  * *************************************************************************/
@@ -95,11 +103,14 @@ sql_api.connect2DB();
 //Landing page when a client access the server
 app.get("/", function (req, res) {
   var fileName = "/quiz.html";
-  res.sendFile(__dirname + fileName);
   session = req.session;
   console.log(session);
-  console.log(session.id)
+  console.log(session.id);
   res.cookie(`Cookie token name`, `Cookie string value`, {
+  });
+  // res.sendFile(__dirname + fileName);
+  res.render('quiz', {
+    cookieAllowed: cookieAllowed
   });
 });
 
@@ -107,20 +118,16 @@ app.get("/", function (req, res) {
 app.post("/quiz-submit", function (req, res) {
   //async db function handler
   callerFunQuizResults(req, res);
-
 });
 
 //store quiz results into db function
 function storeQuizResults(req, res) {
   return new Promise((resolve, reject) => {
     //get form quiz results and then insert to db
-    var jsonObject = form.get_json(req.body);
-    sql_api.insertToDatabase(jsonObject);
-    setTimeout(() => {
-      resolve();
-      ;
-    }, 5000
-    );
+
+    sql_api.insertToDatabase(req.body);
+    setTimeout(() => { resolve(); },
+      500);
   });
 }
 
@@ -132,7 +139,6 @@ async function callerFunQuizResults(req, res) {
   console.log("After waiting");
   //direct to the ejs quiz results page
   res.redirect('/quiz-results');
-  sql_api.connection;
 }
 
 
@@ -143,107 +149,47 @@ app.get('/registration', function (req, res) {
 
 //Submit registered data and returns them to the quiz.html page
 app.post('/registration-submit', function (req, res) {
-  var jsonObject = form.get_json(req.body);
+
+  var jsonObject = req.body;
+
   sql_api.insertToDatabaseRegistration(jsonObject);
   res.sendFile(__dirname + '/quiz.html');
-
 });
 
 //login page
 app.get('/login', function (req, res) {
-  console.log("ejs login");
   res.render('login');
 });
 
 //login details submit
-//TODO: Clean up, so ugly and not dynamic :((( AdL
-app.post('/login-submit', function (req, res) {
+app.post('/login-submit', async function (req, res) {
 
-  //We can probably move this to the form-reader module >>>>>
-  //Retrieving login details
-  let unparsedJSON = form.get_json(req.body);
-  let login_details = [];
+  let loginValidation = await form.valdiateLogin(req, res);
+  let results = {
+    name: loginValidation.name,
+    email: loginValidation.email
+  };
 
-  for (let data in unparsedJSON) {
-    let temp = unparsedJSON[data];
+  if (loginValidation.valid) {
 
-    if (temp instanceof Array) {
-      temp = JSON.stringify(temp);
-    }
 
-    login_details.push(temp);
+    // Res page with results
+    let quiz_data = await sql_api.readQuizEntry();
+
+    i = 0;
+    key_array.forEach(key => {
+      results[key] = quiz_data[i];
+      i++;
+    });
+    res.render("profile", results);
+
+  } else {
+    res.send("Invalid Login");
   }
-
-  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  //Assigning login details
-  let email = login_details[0];
-  let enteredPassword = login_details[1];
-
-  //Reading login data from SQL
-  let data = sql_api.readLogin(email);
-  let customer_values = [];
-
-  data.then((result) => {
-
-    for (var i in result) {
-      customer_values.push(result[i]);
-
-    }
-  }).then(() => {
-    // var custid = customer_values[0];
-    var name = customer_values[1];
-    var password = customer_values[2];
-    var email = customer_values[3];
-
-    if (password === enteredPassword) {
-
-      var quiz_data = sql_api.readQuizEntry();
-      var quiz_values = [];
-
-      //Async chaining functions.
-      quiz_data.then((result) => {
-
-        for (var i in result) {
-          quiz_values.push(result[i]);
-        }
-
-      }).then(() => {
-        var suggestions = quiz_values[0];
-        var time = quiz_values[1];
-        var season = quiz_values[2];
-        var scentStrength = quiz_values[3];
-        var scentMood = quiz_values[4];
-        var scentStyles = quiz_values[5];
-
-
-        /* At the moment not redirecting through a get request, this needs to change.
-         * Having trouble passing parameters to another route. Instead of res.render should be res.redirect('/profile') with
-         * all the paramaters. AdL
-         * */
-        res.render("profile", {
-          name: name,
-          email: email,
-          suggestions: suggestions,
-          time: time,
-          season: season,
-          scentStrength: scentStrength,
-          scentMood: scentMood,
-          scentStyles: scentStyles
-
-        }
-        );
-
-      });
-    } else {
-      res.redirect('/registration');
-    }
-
-  });
-
 });
 
 //Logout (forces cookies and session to clear from browser)
-app.get('/logout',(req,res) => {
+app.get('/logout', (req, res) => {
   req.session.destroy();
   res.redirect('/');
 });
@@ -253,32 +199,28 @@ app.get('/logout',(req,res) => {
 app.get('/quiz-results', function (req, res) {
 
   //Obatining data from database. Async function, returns promise.
-  var data = sql_api.readQuizEntry();
-  var values = [];
-
-  //Async chaining functions.
-  data.then((result) => {
-    // console.log(result);
-    for (var i in result) {
-      values.push(result[i]);
-    }
-  }).then(() => {
-
-    var suggestions = values[0];
-    var time = values[1];
-    var season = values[2];
-    var scentStrength = values[3];
-    var scentMood = values[4];
-    var scentStyles = values[5];
-
-    res.render("quiz_results", {
-      suggestions: suggestions,
-      time: time,
-      season: season,
-      scentStrength: scentStrength,
-      scentMood: scentMood,
-      scentStyles: scentStyles
-    });
+  let quiz_data = await sql_api.readQuizEntry();
+  res.render("quiz_results", {
+    suggestions: quiz_data[0],
+    time: quiz_data[1],
+    season: quiz_data[2],
+    scentStrength: quiz_data[3],
+    scentMood: quiz_data[4],
+    scentStyles: quiz_data[5]
   });
-
 });
+
+//View Shop 
+app.get('/shop', function (req, res) {
+  res.render('shop');
+});
+
+//Accept Cookie
+app.get('/acceptCookie', function (req, res) {
+  cookieAllowed = true;
+  console.log("cookie allowed");
+  res.render('quiz', {
+    cookieAllowed: cookieAllowed
+  });
+});
+
