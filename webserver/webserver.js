@@ -235,3 +235,8 @@ app.get('/quiz-results', function (req, res) {
   });
 
 });
+
+//View Shop 
+app.get('/shop', function (req, res) {
+  res.render('shop');
+});
