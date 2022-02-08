@@ -211,7 +211,7 @@ function validateJSONPost(unparsedJSON) {
 }
 
 
-// Retrieves final row from customer DB and returns to quiz results page
+//Retrieves final row from customer DB and returns to profile page
 function readLogin(email) {
   let account_values = {};
   let sql = `SELECT *  FROM [dbo].[user_accounts]

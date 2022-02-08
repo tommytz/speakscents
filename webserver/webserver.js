@@ -70,9 +70,8 @@ app.post("/quiz-submit", function (req, res) {
 function storeQuizResults(req, res) {
   return new Promise((resolve, reject) => {
     //get form quiz results and then insert to db
-    var jsonObject = form.get_json(req.body);
 
-    sql_api.insertToDatabase(jsonObject);
+    sql_api.insertToDatabase(req.body);
     setTimeout(() => { resolve(); },
       500);
   });
@@ -119,7 +118,7 @@ app.post('/login-submit', async function (req, res) {
   };
 
   if (loginValidation.valid) {
-    // Res page with results
+    // Sends quiz results to profile page.
     let quiz_data = await sql_api.readQuizEntry();
 
     i = 0;
