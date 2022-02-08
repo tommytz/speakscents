@@ -23,6 +23,7 @@ var sql_api = require('./sql_api');
 const { allowedNodeEnvironmentFlags } = require('process');
 const { resolve } = require('path');
 var port = 8080;
+const key_array = ["suggestions", "time", "season", "scentStrength", "scentMood", "scentStyles"];
 
 //Setting node.js for parsing json, multibox forms, css styling
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -63,16 +64,14 @@ app.post("/quiz-submit", function (req, res) {
 
   //async db function handler
   callerFunQuizResults(req, res);
-
 });
 
 //store quiz results into db function
 function storeQuizResults(req, res) {
   return new Promise((resolve, reject) => {
     //get form quiz results and then insert to db
-    var jsonObject = form.get_json(req.body);
 
-    sql_api.insertToDatabase(jsonObject);
+    sql_api.insertToDatabase(req.body);
     setTimeout(() => { resolve(); },
       500);
   });
@@ -86,7 +85,6 @@ async function callerFunQuizResults(req, res) {
   console.log("After waiting");
   //direct to the ejs quiz results page
   res.redirect('/quiz-results');
-
 }
 
 
@@ -103,7 +101,6 @@ app.post('/registration-submit', function (req, res) {
   sql_api.insertToDatabaseRegistration(jsonObject);
 
   res.sendFile(__dirname + '/quiz.html');
-
 });
 
 //login page
@@ -113,38 +110,27 @@ app.get('/login', function (req, res) {
 
 //login details submit
 app.post('/login-submit', async function (req, res) {
-  let valid;
-  let quiz;
-
-  try {
-
-    valid = await form.valdiateLogin(req, res);
-    quiz = await sql_api.readQuizEntry();
-
-  } catch (error) {
-    console.log("Error: ", error);
-  }
 
   let loginValidation = await form.valdiateLogin(req, res);
+  let results = {
+    name: loginValidation.name,
+    email: loginValidation.email
+  };
 
   if (loginValidation.valid) {
-    // Res page with results
+    // Sends quiz results to profile page.
     let quiz_data = await sql_api.readQuizEntry();
-    res.render("profile", {
-      name: loginValidation.name,
-      email: loginValidation.email,
-      suggestions: quiz_data[0],
-      time: quiz_data[1],
-      season: quiz_data[2],
-      scentStrength: quiz_data[3],
-      scentMood: quiz_data[4],
-      scentStyles: quiz_data[5]
+
+    i = 0;
+    key_array.forEach(key => {
+      results[key] = quiz_data[i];
+      i++;
     });
+    res.render("profile", results);
 
   } else {
     res.send("Invalid Login");
   }
-
 });
 
 //This function returns the saved results from the DB and presents it back to the user.
@@ -160,8 +146,6 @@ app.get('/quiz-results', async function (req, res) {
     scentMood: quiz_data[4],
     scentStyles: quiz_data[5]
   });
-});
-
 });
 
 //View Shop 
