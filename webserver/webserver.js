@@ -94,20 +94,17 @@ sql_api.connect2DB();
 
 //Landing page when a client access the server
 app.get("/", function (req, res) {
-
   var fileName = "/quiz.html";
   res.sendFile(__dirname + fileName);
   session = req.session;
   console.log(session);
   console.log(session.id)
   res.cookie(`Cookie token name`, `Cookie string value`, {
-      
   });
 });
 
 //This request gets form data from the quiz and stores data in the database
 app.post("/quiz-submit", function (req, res) {
-
   //async db function handler
   callerFunQuizResults(req, res);
 
@@ -118,7 +115,6 @@ function storeQuizResults(req, res) {
   return new Promise((resolve, reject) => {
     //get form quiz results and then insert to db
     var jsonObject = form.get_json(req.body);
-
     sql_api.insertToDatabase(jsonObject);
     setTimeout(() => {
       resolve();
@@ -147,11 +143,8 @@ app.get('/registration', function (req, res) {
 
 //Submit registered data and returns them to the quiz.html page
 app.post('/registration-submit', function (req, res) {
-
   var jsonObject = form.get_json(req.body);
-
   sql_api.insertToDatabaseRegistration(jsonObject);
-
   res.sendFile(__dirname + '/quiz.html');
 
 });
