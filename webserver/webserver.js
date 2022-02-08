@@ -16,7 +16,8 @@ var upload = multer();
 var helmet = require('helmet');
 var cookieparser = require('cookie-parser');
 var expSessions = require('express-session');
-const MSSQLStore = require('connect-mssql-v2');
+var MSSQLStore = require('connect-mssql-v2');
+var mssql = require('mssql');
 var app = express();
 
 //Local modules required
@@ -26,22 +27,6 @@ var sql_api = require('./sql_api');
 //Server details
 const { allowedNodeEnvironmentFlags } = require('process');
 var port = 8080;
-
-const username = "Morgan";
-const password = "TestDB0001928";
-const server_name = "speakscents-test-server.database.windows.net";
-const db_name = "test_database";
-
-// Config required for database connection
-const config = {
-  user: username,
-  password: password,
-  server: server_name,
-  database: db_name,
-  options: {
-    encrypt: true
-  }
-};
 
 //Setting node.js for parsing json, multibox forms, css styling
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -56,11 +41,32 @@ app.use(flash());
 app.use('/css', express.static(__dirname + '/css'));
 app.use(helmet());
 app.use(cookieparser());
+var options = {
+  user: 'Morgan',
+  password: 'TestDB0001928',
+	database: 'test_database',
+  server: "speakscents-test-server.database.windows.net",
+  port: 1433,
+  options: {
+    trustServerCertificate: true,
+    encrypt : true,
+    table: 'session_data'
+  }
+};
+var connection = mssql.connect(options);
+console.log(connection);
+var sessionStore = new MSSQLStore(options, connection);
+
+sessionStore.on('connect', () => {
+	console.log('here')
+});
+
+//console.log(sessionStore);
 app.use(expSessions({
-  store: new MSSQLStore(config),
   secret: "secret key to sign cookie",
-  saveUninitialized: false,
-  resave: false,
+  saveUninitialized: true,
+  resave: true,
+  store: sessionStore,
   cookie: { 
     maxAge: 1800000,
     secure: true,
@@ -93,6 +99,7 @@ app.get("/", function (req, res) {
   res.sendFile(__dirname + fileName);
   session = req.session;
   console.log(session);
+  console.log(session.id)
   res.cookie(`Cookie token name`, `Cookie string value`, {
       
   });
@@ -129,7 +136,7 @@ async function callerFunQuizResults(req, res) {
   console.log("After waiting");
   //direct to the ejs quiz results page
   res.redirect('/quiz-results');
-
+  sql_api.connection;
 }
 
 
