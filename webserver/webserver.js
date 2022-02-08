@@ -21,6 +21,7 @@ var sql_api = require('./sql_api');
 
 //Server details
 const { allowedNodeEnvironmentFlags } = require('process');
+const { resolve } = require('path');
 var port = 8080;
 
 //Setting node.js for parsing json, multibox forms, css styling
@@ -72,11 +73,8 @@ function storeQuizResults(req, res) {
     var jsonObject = form.get_json(req.body);
 
     sql_api.insertToDatabase(jsonObject);
-    setTimeout(() => {
-      resolve();
-      ;
-    }, 500
-    );
+    setTimeout(() => { resolve(); },
+      500);
   });
 }
 
@@ -110,129 +108,59 @@ app.post('/registration-submit', function (req, res) {
 
 //login page
 app.get('/login', function (req, res) {
-  console.log("ejs login");
   res.render('login');
 });
 
 //login details submit
-//TODO: Clean up, so ugly and not dynamic :((( AdL
-app.post('/login-submit', function (req, res) {
+app.post('/login-submit', async function (req, res) {
+  let valid;
+  let quiz;
 
-  //We can probably move this to the form-reader module >>>>>
-  //Retrieving login details
-  let unparsedJSON = form.get_json(req.body);
-  let login_details = [];
+  try {
 
-  for (let data in unparsedJSON) {
-    let temp = unparsedJSON[data];
+    valid = await form.valdiateLogin(req, res);
+    quiz = await sql_api.readQuizEntry();
 
-    if (temp instanceof Array) {
-      temp = JSON.stringify(temp);
-    }
-
-    login_details.push(temp);
+  } catch (error) {
+    console.log("Error: ", error);
   }
 
-  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  //Assigning login details
-  let email = login_details[0];
-  let enteredPassword = login_details[1];
+  let loginValidation = await form.valdiateLogin(req, res);
 
-  //Reading login data from SQL
-  let data = sql_api.readLogin(email);
-  let customer_values = [];
+  if (loginValidation.valid) {
+    // Res page with results
+    let quiz_data = await sql_api.readQuizEntry();
+    res.render("profile", {
+      name: loginValidation.name,
+      email: loginValidation.email,
+      suggestions: quiz_data[0],
+      time: quiz_data[1],
+      season: quiz_data[2],
+      scentStrength: quiz_data[3],
+      scentMood: quiz_data[4],
+      scentStyles: quiz_data[5]
+    });
 
-  data.then((result) => {
-
-    for (var i in result) {
-      customer_values.push(result[i]);
-
-    }
-  }).then(() => {
-    // var custid = customer_values[0];
-    var name = customer_values[1];
-    var password = customer_values[2];
-    var email = customer_values[3];
-
-    if (password === enteredPassword) {
-
-      var quiz_data = sql_api.readQuizEntry();
-      var quiz_values = [];
-      console.log(quiz_data);
-
-      //Async chaining functions.
-      quiz_data.then((result) => {
-
-        for (var i in result) {
-          quiz_values.push(result[i]);
-        }
-
-      }).then(() => {
-        var suggestions = quiz_values[0];
-        var time = quiz_values[1];
-        var season = quiz_values[2];
-        var scentStrength = quiz_values[3];
-        var scentMood = quiz_values[4];
-        var scentStyles = quiz_values[5];
-
-
-        /* At the moment not redirecting through a get request, this needs to change.
-         * Having trouble passing parameters to another route. Instead of res.render should be res.redirect('/profile') with
-         * all the paramaters. AdL
-         * */
-        res.render("profile", {
-          name: name,
-          email: email,
-          suggestions: suggestions,
-          time: time,
-          season: season,
-          scentStrength: scentStrength,
-          scentMood: scentMood,
-          scentStyles: scentStyles
-
-        }
-        );
-
-      });
-    } else {
-      res.redirect('/registration');
-    }
-
-  });
+  } else {
+    res.send("Invalid Login");
+  }
 
 });
 
 //This function returns the saved results from the DB and presents it back to the user.
-app.get('/quiz-results', function (req, res) {
+app.get('/quiz-results', async function (req, res) {
 
   //Obatining data from database. Async function, returns promise.
-  var data = sql_api.readQuizEntry();
-  var values = [];
-
-  //Async chaining functions.
-  data.then((result) => {
-    // console.log(result);
-    for (var i in result) {
-      values.push(result[i]);
-    }
-  }).then(() => {
-
-    var suggestions = values[0];
-    var time = values[1];
-    var season = values[2];
-    var scentStrength = values[3];
-    var scentMood = values[4];
-    var scentStyles = values[5];
-
-    res.render("quiz_results", {
-      suggestions: suggestions,
-      time: time,
-      season: season,
-      scentStrength: scentStrength,
-      scentMood: scentMood,
-      scentStyles: scentStyles
-    });
+  let quiz_data = await sql_api.readQuizEntry();
+  res.render("profile", {
+    suggestions: quiz_data[0],
+    time: quiz_data[1],
+    season: quiz_data[2],
+    scentStrength: quiz_data[3],
+    scentMood: quiz_data[4],
+    scentStyles: quiz_data[5]
   });
+});
 
 });
 
@@ -240,3 +168,4 @@ app.get('/quiz-results', function (req, res) {
 app.get('/shop', function (req, res) {
   res.render('shop');
 });
+

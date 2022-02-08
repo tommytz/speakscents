@@ -226,11 +226,11 @@ function validateJSONPost(unparsedJSON) {
 // Retrieves final row from customer DB and returns to quiz results page
 function readLogin(email) {
 
-  return queryPromise = new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
 
-    var result = [];
+    let account_values = {};
     let sql = `SELECT *  FROM [dbo].[user_accounts]
-    WHERE email='`+email+`';`;
+    WHERE email='`+ email + `';`;
 
     const request = new Request(sql, (err) => {
       if (err) {
@@ -238,23 +238,21 @@ function readLogin(email) {
         reject();
       } else {
 
-        resolve(result);
+        resolve(account_values);
       }
     });
 
     request.on("row", function (columns) { //on the returned row(s)
       columns.forEach(function (column) { //for each of the columns in the row(s)
-        // console.log(`${column.metadata.colName}: ${column.value}`); //Print the columnname : value
-        let temp = (`${column.value}`);
-        result.push(temp);
+        account_values[column.metadata.colName] = column.value;
       });
     });
 
     connection.execSql(request);
 
-  }).then((result) => {
+  }).then((account_values) => {
 
-    return result;
+    return account_values;
   }).catch((err) => {
 
     console.log(err + "error in catch");
