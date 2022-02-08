@@ -123,35 +123,20 @@ app.post('/login-submit', async function (req, res) {
     console.log("Error: ", error);
   }
 
-<<<<<<< HEAD
-  console.log(quiz)
-  if(valid[0]) {
-    
-    res.render("profile",{
-      name: valid[1],
-      email: valid[2],
-      suggestions: quiz[0],
-      time: quiz[1],
-      season: quiz[2],
-      scentStrength: quiz[3],
-      scentMood: quiz[4],
-      scentStyles: quiz[5]
-=======
   let loginValidation = await form.valdiateLogin(req, res);
 
   if (loginValidation[2]) {
     // Res page with results
     let quiz_data = await sql_api.readQuizEntry();
     res.render("profile", {
-      name: loginValidation[0],
-      email: loginValidation[1],
+      name: loginValidation[1],
+      email: loginValidation[2],
       suggestions: quiz_data[0],
       time: quiz_data[1],
       season: quiz_data[2],
       scentStrength: quiz_data[3],
       scentMood: quiz_data[4],
       scentStyles: quiz_data[5]
->>>>>>> ef97162adfdd3ae40c54cba15de9646b5e7a0184
     });
 
   } else {
