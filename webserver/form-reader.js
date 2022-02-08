@@ -15,6 +15,10 @@
  *  This function retrieves the results from HTML form when submitted and returns a JSON object.
     Note: not useful for Express.js
  */
+
+var sql_api = require('./sql_api');
+
+
 const get_results = function (body) {
 
   var data = "{";
@@ -98,4 +102,44 @@ const get_jsonAsString = function (body) {
 
 };
 
-module.exports = { get_json, get_jsonAsList, get_jsonAsListOfValues, get_jsonAsString, get_results };
+
+function getLoginFormDetails(req, res){
+
+  let unparsedJSON = get_json(req.body);
+  let login_details = [];
+
+  for (let data in unparsedJSON) {
+    let temp = unparsedJSON[data];
+
+    if (temp instanceof Array) {
+      temp = JSON.stringify(temp);
+    }
+
+    login_details.push(temp);
+  }
+
+  return login_details;
+}
+
+//Validates login.
+async function valdiateLogin(req,res){
+  
+    let submittedLogin = getLoginFormDetails(req,res);
+    let submittedEmail = submittedLogin[0];
+    let submittedPassword = submittedLogin[1];
+    let databaseLogin;
+    let databasePassword;
+
+    try{
+      
+      databaseLogin = await sql_api.readLogin(submittedEmail);
+      databasePassword = databaseLogin[2];
+
+    } catch (error){
+      console.log(error);
+    }
+
+    return submittedPassword === databasePassword;
+}
+
+module.exports = { get_json, get_jsonAsList, get_jsonAsListOfValues, get_jsonAsString, get_results, valdiateLogin };
