@@ -30,7 +30,7 @@ const get_results = function (body) {
     if (data_elements[i].type === "radio" || data_elements[i].type === "checkbox") {
       data = data + `"${data_elements[i].getAttribute("id")}":"${data_elements[i].checked}"`;
 
-    } else if (data_elements[i].type === "text"|| reg_elements[i].type === "email" || reg_elements[i].type === "tel" || reg_elements[i].type === "password") {
+    } else if (data_elements[i].type === "text" || reg_elements[i].type === "email" || reg_elements[i].type === "tel" || reg_elements[i].type === "password") {
       data = data + `"${data_elements[i].getAttribute("id")}":"${data_elements[i].value}"`;
 
     }
@@ -41,7 +41,7 @@ const get_results = function (body) {
       data = data + ",";
     }
   }
-  
+
   //Creates JSON Object
   var data_JSON = JSON.parse(data);
 
@@ -66,9 +66,9 @@ const get_jsonAsList = function (body) {
 
   var results = [];
 
-  for(var key in body){
+  for (var key in body) {
 
-      results.push([key, body[key]]);
+    results.push([key, body[key]]);
   }
 
 
@@ -81,10 +81,10 @@ const get_jsonAsList = function (body) {
 const get_jsonAsListOfValues = function (body) {
 
   var results = [];
-  
-  for(var key in body){
 
-      results.push(body[key]);
+  for (var key in body) {
+
+    results.push(body[key]);
   }
 
   return results;
@@ -103,7 +103,7 @@ const get_jsonAsString = function (body) {
 };
 
 
-function getLoginFormDetails(req, res){
+function getLoginFormDetails(req, res) {
 
   let unparsedJSON = get_json(req.body);
   let login_details = [];

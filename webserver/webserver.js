@@ -123,6 +123,7 @@ app.post('/login-submit', async function (req, res) {
     console.log("Error: ", error);
   }
 
+<<<<<<< HEAD
   console.log(quiz)
   if(valid[0]) {
     
@@ -135,12 +136,28 @@ app.post('/login-submit', async function (req, res) {
       scentStrength: quiz[3],
       scentMood: quiz[4],
       scentStyles: quiz[5]
+=======
+  let loginValidation = await form.valdiateLogin(req, res);
+
+  if (loginValidation[2]) {
+    // Res page with results
+    let quiz_data = await sql_api.readQuizEntry();
+    res.render("profile", {
+      name: loginValidation[0],
+      email: loginValidation[1],
+      suggestions: quiz_data[0],
+      time: quiz_data[1],
+      season: quiz_data[2],
+      scentStrength: quiz_data[3],
+      scentMood: quiz_data[4],
+      scentStyles: quiz_data[5]
+>>>>>>> ef97162adfdd3ae40c54cba15de9646b5e7a0184
     });
 
   } else {
     res.send("Invalid Login");
   }
-  
+
 });
 
 //This function returns the saved results from the DB and presents it back to the user.
