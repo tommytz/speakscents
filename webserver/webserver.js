@@ -35,6 +35,8 @@ app.use(flash());
 //   next();
 // });
 app.use('/css', express.static(__dirname + '/css'));
+app.use('/static_scripts', express.static(__dirname + '/static_scripts'));
+
 app.set('view engine', 'ejs'); //Changing the engine to ejs, so we can view/embed data in particular way
 
 //Server creation and listening on port number. This is called automatically when this module is initialised
@@ -160,4 +162,10 @@ app.get('/quiz-results', async function (req, res) {
   });
 });
 
+});
+
+//View Shop 
+app.get('/shop', function (req, res) {
+  res.render('shop');
+});
 

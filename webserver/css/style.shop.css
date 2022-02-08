@@ -1,0 +1,12 @@
+button {
+    margin: 15px;
+
+}
+
+button:hover {
+    opacity: 50%;
+}
+
+
+
+
