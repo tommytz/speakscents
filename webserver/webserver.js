@@ -14,6 +14,7 @@ var flash = require('connect-flash');
 var ejs = require('ejs');
 var upload = multer();
 var app = express();
+var session = require('client-sessions');
 
 //Local modules required
 var form = require('./form-reader.js');
@@ -46,6 +47,14 @@ app.listen(port, () => {
 
 //Opening connection to database
 sql_api.connect2DB();
+
+//cookie
+app.use(session({
+  cookieName: 'session',
+  secret: 'random_string_goes_here',
+  duration: 30 * 60 * 1000,
+  activeDuration: 5 * 60 * 1000,
+}));
 
 /* *************************************************************************
  * Processing requests from webengine
@@ -128,6 +137,10 @@ app.post('/login-submit', async function (req, res) {
   let loginValidation = await form.valdiateLogin(req, res);
 
   if (loginValidation.valid) {
+
+    // sets a cookie with the user's info
+    req.session.user = user;
+
     // Res page with results
     let quiz_data = await sql_api.readQuizEntry();
     res.render("profile", {
@@ -162,7 +175,7 @@ app.get('/quiz-results', async function (req, res) {
   });
 });
 
-});
+
 
 //View Shop 
 app.get('/shop', function (req, res) {
