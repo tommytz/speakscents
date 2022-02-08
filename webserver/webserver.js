@@ -50,7 +50,7 @@ var options = {
   options: {
     trustServerCertificate: true,
     encrypt : true,
-    table: 'session_data'
+    table: 'sessions'
   }
 };
 var connection = mssql.connect(options);
