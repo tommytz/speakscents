@@ -7,6 +7,4 @@ function denyCookie() {
     document.getElementById("cookie_popup").style.display="none";
 }
 
-function acceptCookie(){
-    //TODO create cookies
-}
+

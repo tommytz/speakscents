@@ -99,6 +99,7 @@ async function valdiateLogin(req, res) {
   let databaseLogin;
   let databasePassword;
   let databaseName;
+  let databaseId;
   let databaseEmail;
   let isValid;
 
@@ -107,6 +108,7 @@ async function valdiateLogin(req, res) {
     databaseLogin = await sql_api.readLogin(submittedEmail);
     databasePassword = databaseLogin.password;
     databaseName = databaseLogin.name;
+    databaseId = databaseLogin.customer_id;
     databaseEmail = databaseLogin.email;
     isValid = (submittedPassword === databasePassword);
 
@@ -117,7 +119,8 @@ async function valdiateLogin(req, res) {
   let loginObject = {
     valid: isValid,
     name: databaseName,
-    email: databaseEmail
+    email: databaseEmail,
+    id: databaseId
   };
 
 

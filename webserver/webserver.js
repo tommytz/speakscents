@@ -15,6 +15,8 @@ var ejs = require('ejs');
 var upload = multer();
 var app = express();
 
+var cookieAllowed = false;
+
 //Local modules required
 var form = require('./form-reader.js');
 var sql_api = require('./sql_api');
@@ -48,6 +50,7 @@ app.listen(port, () => {
 //Opening connection to database
 sql_api.connect2DB();
 
+
 /* *************************************************************************
  * Processing requests from webengine
  * *************************************************************************/
@@ -56,7 +59,10 @@ sql_api.connect2DB();
 app.get("/", function (req, res) {
 
   var fileName = "/quiz.html";
-  res.sendFile(__dirname + fileName);
+  // res.sendFile(__dirname + fileName);
+  res.render('quiz',{
+    cookieAllowed: cookieAllowed
+  })
 });
 
 //This request gets form data from the quiz and stores data in the database
@@ -118,7 +124,9 @@ app.post('/login-submit', async function (req, res) {
   };
 
   if (loginValidation.valid) {
-    // Sends quiz results to profile page.
+
+
+    // Res page with results
     let quiz_data = await sql_api.readQuizEntry();
 
     i = 0;
@@ -151,5 +159,14 @@ app.get('/quiz-results', async function (req, res) {
 //View Shop 
 app.get('/shop', function (req, res) {
   res.render('shop');
+});
+
+//Accept Cookie
+app.get('/acceptCookie', function (req, res) {
+  cookieAllowed = true;
+  console.log("cookie allowed");
+  res.render('quiz', {
+    cookieAllowed: cookieAllowed
+  })
 });
 
