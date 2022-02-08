@@ -122,7 +122,7 @@ app.post('/login-submit', async function (req, res) {
     let quiz_data = await sql_api.readQuizEntry();
     res.render("profile", {
       name: loginValidation[0],
-      email: loginValidation[1],
+      email: loginValidation[0],
       suggestions: quiz_data[0],
       time: quiz_data[1],
       season: quiz_data[2],
