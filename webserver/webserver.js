@@ -71,11 +71,8 @@ function storeQuizResults(req, res) {
     var jsonObject = form.get_json(req.body);
 
     sql_api.insertToDatabase(jsonObject);
-    setTimeout(() => {
-      resolve();
-      ;
-    }, 500
-    );
+    setTimeout(() => { resolve(); }, 
+    500);
   });
 }
 
@@ -114,11 +111,32 @@ app.get('/login', function (req, res) {
 
 //login details submit
 app.post('/login-submit', async function (req, res) {
+  let valid;
+  let quiz;
+  
+  try{
 
-  let valid = await form.valdiateLogin(req, res);
+    valid = await form.valdiateLogin(req, res);
+    quiz = await sql_api.readQuizEntry();
+    
+  } catch (error){
+    console.log("Error: ", error);
+  }
 
-  if(valid) {
-    res.send("Valid Login");
+  console.log(quiz)
+  if(valid[0]) {
+    
+    res.render("profile",{
+      name: valid[1],
+      email: valid[2],
+      suggestions: quiz[0],
+      time: quiz[1],
+      season: quiz[2],
+      scentStrength: quiz[3],
+      scentMood: quiz[4],
+      scentStyles: quiz[5]
+    });
+
   } else {
     res.send("Invalid Login");
   }

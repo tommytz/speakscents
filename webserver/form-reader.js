@@ -129,17 +129,26 @@ async function valdiateLogin(req,res){
     let submittedPassword = submittedLogin[1];
     let databaseLogin;
     let databasePassword;
+    let datbaseName;
+    let databaseEmail;
+    let isValid;
 
     try{
       
       databaseLogin = await sql_api.readLogin(submittedEmail);
       databasePassword = databaseLogin[2];
+      databaseName = databaseLogin[1];
+      databaseEmail = databaseLogin[3];
+      isValid = (submittedPassword === databasePassword);
 
     } catch (error){
       console.log(error);
     }
 
-    return submittedPassword === databasePassword;
+    let loginArray = [isValid, databaseName, databaseEmail];
+
+
+    return loginArray;
 }
 
 module.exports = { get_json, get_jsonAsList, get_jsonAsListOfValues, get_jsonAsString, get_results, valdiateLogin };
