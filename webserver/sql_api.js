@@ -261,4 +261,4 @@ function readLogin(email) {
   });
 }
 
-module.exports = { connect2DB, insertToDatabase, queryFromDatabase, readQuizEntry, insertToDatabaseRegistration, readLogin };
+module.exports = { connect2DB, insertToDatabase, queryFromDatabase, readQuizEntry, insertToDatabaseRegistration, readLogin, connection };

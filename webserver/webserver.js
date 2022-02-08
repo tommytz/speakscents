@@ -65,7 +65,7 @@ sessionStore.on('connect', () => {
 app.use(expSessions({
   secret: "secret key to sign cookie",
   saveUninitialized: true,
-  resave: true,
+  resave: false,
   store: sessionStore,
   cookie: { 
     maxAge: 1800000,
