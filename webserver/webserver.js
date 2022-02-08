@@ -138,7 +138,7 @@ app.get('/quiz-results', async function (req, res) {
 
   //Obatining data from database. Async function, returns promise.
   let quiz_data = await sql_api.readQuizEntry();
-  res.render("profile", {
+  res.render("quiz_results", {
     suggestions: quiz_data[0],
     time: quiz_data[1],
     season: quiz_data[2],
