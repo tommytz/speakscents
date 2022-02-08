@@ -71,11 +71,8 @@ function storeQuizResults(req, res) {
     var jsonObject = form.get_json(req.body);
 
     sql_api.insertToDatabase(jsonObject);
-    setTimeout(() => {
-      resolve();
-      ;
-    }, 500
-    );
+    setTimeout(() => { resolve(); },
+      500);
   });
 }
 
@@ -114,6 +111,17 @@ app.get('/login', function (req, res) {
 
 //login details submit
 app.post('/login-submit', async function (req, res) {
+  let valid;
+  let quiz;
+
+  try {
+
+    valid = await form.valdiateLogin(req, res);
+    quiz = await sql_api.readQuizEntry();
+
+  } catch (error) {
+    console.log("Error: ", error);
+  }
 
   let loginValidation = await form.valdiateLogin(req, res);
 
@@ -121,8 +129,8 @@ app.post('/login-submit', async function (req, res) {
     // Res page with results
     let quiz_data = await sql_api.readQuizEntry();
     res.render("profile", {
-      name: loginValidation[0],
-      email: loginValidation[0],
+      name: loginValidation[1],
+      email: loginValidation[2],
       suggestions: quiz_data[0],
       time: quiz_data[1],
       season: quiz_data[2],

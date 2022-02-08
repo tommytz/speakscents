@@ -122,25 +122,33 @@ function getLoginFormDetails(req, res) {
 }
 
 //Validates login.
-async function valdiateLogin(req, res) {
+async function valdiateLogin(req,res){
+  
+    let submittedLogin = getLoginFormDetails(req,res);
+    let submittedEmail = submittedLogin[0];
+    let submittedPassword = submittedLogin[1];
+    let databaseLogin;
+    let databasePassword;
+    let datbaseName;
+    let databaseEmail;
+    let isValid;
 
-  let submittedLogin = getLoginFormDetails(req, res);
-  let submittedEmail = submittedLogin[0];
-  let submittedPassword = submittedLogin[1];
-  let databaseLogin;
-  let databasePassword;
+    try{
+      
+      databaseLogin = await sql_api.readLogin(submittedEmail);
+      databasePassword = databaseLogin[2];
+      databaseName = databaseLogin[1];
+      databaseEmail = databaseLogin[3];
+      isValid = (submittedPassword === databasePassword);
 
-  try {
+    } catch (error){
+      console.log(error);
+    }
 
-    databaseLogin = await sql_api.readLogin(submittedEmail);
-    databasePassword = databaseLogin[2];
+    let loginArray = [isValid, databaseName, databaseEmail];
 
-  } catch (error) {
-    console.log(error);
-  }
 
-  submittedLogin.push(submittedPassword === databasePassword);
-  return submittedLogin;
+    return loginArray;
 }
 
 module.exports = { get_json, get_jsonAsList, get_jsonAsListOfValues, get_jsonAsString, get_results, valdiateLogin };
