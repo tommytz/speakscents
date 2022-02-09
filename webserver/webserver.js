@@ -74,9 +74,11 @@ sessionStore.on('connect', () => {
 //console.log(sessionStore);
 app.use(expSessions({
   secret: "secret key to sign cookie",
-  saveUninitialized: true,
+  saveUninitialized: false,
   resave: false,
   store: sessionStore,
+  user: "guest",
+  purchase_vist: false,
   cookie: {
     maxAge: 1800000,
     secure: true,
@@ -102,12 +104,14 @@ sql_api.connect2DB();
 
 //Landing page when a client access the server
 app.get("/", function (req, res) {
+  if(req.session.id===null){
   var fileName = "/quiz.html";
   session = req.session;
   console.log(session);
-  console.log(session.id);
-  res.cookie(`Cookie token name`, `Cookie string value`, {
+  console.log(session.id); 
+  res.cookie(`Cookie token name`, session.id, {
   });
+  }
   // res.sendFile(__dirname + fileName);
   res.render('quiz', {
     cookieAllowed: cookieAllowed
@@ -172,6 +176,13 @@ app.post('/login-submit', async function (req, res) {
 
   if (loginValidation.valid) {
 
+    // sets a cookie with the user's info
+    req.session.user = loginValidation.id;
+
+    console.log(loginValidation.id);
+    console.log("login successful" + loginValidation.name);
+    console.log(req.session.user);
+    console.log(req.session.id);
 
     // Res page with results
     let quiz_data = await sql_api.readQuizEntry();
@@ -196,7 +207,7 @@ app.get('/logout', (req, res) => {
 
 //This function returns the saved results from the DB and presents it back to the user
 // WORK IN PROGRESS 02/02/2022 11:39am
-app.get('/quiz-results', function (req, res) {
+app.get('/quiz-results', async function (req, res) {
 
   //Obatining data from database. Async function, returns promise.
   let quiz_data = await sql_api.readQuizEntry();
@@ -212,6 +223,9 @@ app.get('/quiz-results', function (req, res) {
 
 //View Shop 
 app.get('/shop', function (req, res) {
+  req.session.purchase_vist = true;
+  console.log(req.session.id);
+  console.log(req.session.purchase_vist);
   res.render('shop');
 });
 
