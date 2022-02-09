@@ -196,7 +196,7 @@ app.get('/logout', (req, res) => {
 
 //This function returns the saved results from the DB and presents it back to the user
 // WORK IN PROGRESS 02/02/2022 11:39am
-app.get('/quiz-results', function (req, res) {
+app.get('/quiz-results', async function (req, res) {
 
   //Obatining data from database. Async function, returns promise.
   let quiz_data = await sql_api.readQuizEntry();
