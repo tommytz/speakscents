@@ -59,6 +59,8 @@ app.set("view engine", "ejs");
 
 app.use(helmet());
 app.use(cookieparser());
+
+//Connection configuration for MSSQLStore
 var options = {
   user: "Morgan",
   password: "TestDB0001928",
@@ -71,14 +73,13 @@ var options = {
     table: "sessions",
   },
 };
+
+//Establishing a connection to session table of the database and setting it as the storage location for session data
 var connection = mssql.connect(options);
-console.log(connection);
 var sessionStore = new MSSQLStore(options, connection);
+var session;
 
-sessionStore.on("connect", () => {
-  console.log("here");
-});
-
+//Declare attributes of client session 
 app.use(expSessions({
   secret: "secret key to sign cookie",
   saveUninitialized: true,
@@ -94,8 +95,6 @@ app.use(expSessions({
   },
 }));
 
-var session;
-
 //Server creation and listening on port number. This is called automatically when this module is initialised
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
@@ -109,21 +108,12 @@ sql_api.connect2DB();
  * *************************************************************************/
 
 //Landing page when a client access the server
-app.get("/", function (req, res) {
-    
-    if(req.session.id){
-      session = req.session;
-      console.log(session);
-      console.log(req.session.id, "++++");
-      console.log(req.headers);
-      // console.log(session.id);
-      // console.log(req.headers);
-    }
-  
+app.get("/", function (req, res) { 
+  if(req.session.id){
+    session = req.session;
+  };
   res.cookie(`Cookie token name`, session.id, {
   });
-  
-  // res.sendFile(__dirname + fileName);
   res.render("quiz", {
     cookieAllowed: cookieAllowed,
   });
