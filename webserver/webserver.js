@@ -29,6 +29,7 @@ var sql_api = require('./sql_api');
 //Server details
 const { allowedNodeEnvironmentFlags } = require('process');
 const { resolve } = require('path');
+const { Cookie } = require('express-session');
 var port = 8080;
 const key_array = ["suggestions", "time", "season", "scentStrength", "scentMood", "scentStyles"];
 
@@ -71,18 +72,17 @@ sessionStore.on('connect', () => {
   console.log('here');
 });
 
-//console.log(sessionStore);
 app.use(expSessions({
   secret: "secret key to sign cookie",
-  saveUninitialized: false,
+  saveUninitialized: true,
   resave: false,
   store: sessionStore,
   user: "guest",
   purchase_vist: false,
   cookie: {
     maxAge: 1800000,
-    secure: true,
-    httpOnly: true,
+    secure: false,
+    httpOnly: false,
     sameSite: 'lax'
   },
 }));
@@ -104,14 +104,19 @@ sql_api.connect2DB();
 
 //Landing page when a client access the server
 app.get("/", function (req, res) {
-  if(req.session.id===null){
-  var fileName = "/quiz.html";
-  session = req.session;
-  console.log(session);
-  console.log(session.id); 
+    
+    if(req.session.id){
+      session = req.session;
+      console.log(session);
+      console.log(req.session.id, "++++");
+      console.log(req.headers);
+      // console.log(session.id);
+      // console.log(req.headers);
+    }
+  
   res.cookie(`Cookie token name`, session.id, {
   });
-  }
+  
   // res.sendFile(__dirname + fileName);
   res.render('quiz', {
     cookieAllowed: cookieAllowed
