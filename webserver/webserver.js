@@ -107,13 +107,15 @@ sql_api.connect2DB();
 
 //Landing page when a client access the server
 app.get("/", function (req, res) { 
-  if(req.session.id){
+  if(!req.session){
     session = req.session;
-  };
-  res.cookie(`Cookie token name`, session.id, {
+  
+  res.cookie(`Cookie token name`, req.session.id, {
   });
   req.session.user= "guest";
   req.session.purchase_vist= false;
+
+};
   res.render("quiz", {
     cookieAllowed: cookieAllowed,
   });
@@ -130,7 +132,8 @@ function storeQuizResults(req, res) {
   return new Promise((resolve, reject) => {
     //get form quiz results and then insert to db
 
-    sql_api.insertToDatabase(req.body);
+    console.log(req.session.user);
+    sql_api.insertToDatabase(req.body, req.session.user);
     setTimeout(() => {
       resolve();
     }, 500);
@@ -183,7 +186,7 @@ app.post("/login-submit", async function (req, res) {
     console.log(req.session.id);
 
     // Res page with results
-    let quiz_data = await sql_api.readQuizEntry();
+    let quiz_data = await sql_api.readUserQuizEntry(req.session.user);
 
     i = 0;
     key_array.forEach((key) => {

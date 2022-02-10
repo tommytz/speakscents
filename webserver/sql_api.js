@@ -54,14 +54,14 @@ const connect2DB = function () {
 };
 
 //This uploads data from the webserver to the customer database
-const insertToDatabase = function (jsonData) {
+const insertToDatabase = function (jsonData, custID) {
   console.log("Inserting into Table...");
   let answer_array = validateJSONPost(jsonData);
   console.log(answer_array);
 
   // Constructing the request for the insert query
   var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, `;
-  var values = `VALUES ('123', 'answer', 'cluster', '1', `;
+  var values = `VALUES ('`+custID+`', 'answer', 'cluster', '1', `;
   query += generateQuizCols(answer_array) + values + generateQuizParams(answer_array);
 
   const request = new Request(query, (err) => {
@@ -129,6 +129,33 @@ function readQuizEntry() {
     connection.execSql(request);
   });
 }
+//TODO
+// Retrieves final row from customer DB for sepcific user and returns to quiz results page
+function readUserQuizEntry(userID) {
+  var result = [];
+  
+  let sql = `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM [dbo].[quiz_results]
+  WHERE customer_id='`+ userID + `';`;
+
+  return new Promise((resolve, reject) => {
+    const request = new Request(sql, (err) => {
+      if (err) {
+        reject();
+      }
+      resolve(result);
+    });
+
+    request.on("row", function (columns) { //on the returned row(s)
+      columns.forEach(function (column) { //for each of the columns in the row(s)
+        // console.log(`${column.metadata.colName}: ${column.value}`); //Print the columnname : value
+        let temp = (`${column.value}`);
+        result.push(temp);
+      });
+    });
+
+    connection.execSql(request);
+  });
+}
 
 const insertToDatabaseRegistration = function (unparsedJSON) {
   console.log("Inserting into Table...");
@@ -144,8 +171,8 @@ const insertToDatabaseRegistration = function (unparsedJSON) {
   console.log(answer_array);
 
   // Constructing the request for the insert query
-  var query = `INSERT INTO user_accounts (customer_id, name, password, email) `;
-  var values = ` VALUES (123, @name, @password, @email) `;
+  var query = `INSERT INTO user_accounts (name, password, email) `;
+  var values = ` VALUES ( @name, @password, @email) `;
 
   const request = new Request(query + values
     , (err) => {
@@ -235,4 +262,4 @@ function readLogin(email) {
   });
 }
 
-module.exports = { connect2DB, insertToDatabase, queryFromDatabase, readQuizEntry, insertToDatabaseRegistration, readLogin, connection };
+module.exports = { connect2DB, readUserQuizEntry, insertToDatabase, queryFromDatabase, readQuizEntry, insertToDatabaseRegistration, readLogin, connection };
