@@ -20,7 +20,8 @@ var MSSQLStore = require("connect-mssql-v2");
 var mssql = require("mssql");
 var app = express();
 
-var cookieAllowed = false;
+//Measuring user time
+var cookieAllowed = true;
 const { performance } = require("perf_hooks");
 var startTime = {};
 
