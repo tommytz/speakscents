@@ -85,8 +85,6 @@ app.use(expSessions({
   saveUninitialized: true,
   resave: false,
   store: sessionStore,
-  user: "guest",
-  purchase_vist: false,
   cookie: {
     maxAge: 1800000,
     secure: false,
@@ -114,6 +112,8 @@ app.get("/", function (req, res) {
   };
   res.cookie(`Cookie token name`, session.id, {
   });
+  req.session.user= "guest";
+  req.session.purchase_vist= false;
   res.render("quiz", {
     cookieAllowed: cookieAllowed,
   });
