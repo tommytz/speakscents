@@ -135,7 +135,7 @@ function readUserQuizEntry(userID) {
   var result = [];
   
   let sql = `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM [dbo].[quiz_results]
-  WHERE customer_id='`+ userID + `';`;
+  WHERE customer_id='`+ userID + `'ORDER BY quiz_results.quiz_id DESC;`;
 
   return new Promise((resolve, reject) => {
     const request = new Request(sql, (err) => {

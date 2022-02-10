@@ -107,15 +107,16 @@ sql_api.connect2DB();
 
 //Landing page when a client access the server
 app.get("/", function (req, res) { 
-  if(!req.session){
-    session = req.session;
   
+  session = req.session;
+  if(!req.session.user){
+    req.session.user= "Guest: "+ Date();
+    req.session.purchase_vist= false;
+  
+  };
   res.cookie(`Cookie token name`, req.session.id, {
   });
-  req.session.user= "guest";
-  req.session.purchase_vist= false;
-
-};
+  
   res.render("quiz", {
     cookieAllowed: cookieAllowed,
   });
