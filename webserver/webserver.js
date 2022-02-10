@@ -21,6 +21,8 @@ var mssql = require("mssql");
 var app = express();
 
 var cookieAllowed = false;
+const { performance } = require('perf_hooks');
+var startTime = {};
 
 //Local modules required
 var form = require("./form-reader.js");
@@ -106,7 +108,8 @@ sql_api.connect2DB();
  * *************************************************************************/
 
 //Landing page when a client access the server
-app.get("/", function (req, res) { 
+app.get("/", function (req, res) {
+  startTime = performance.now();
   if(req.session.id){
     session = req.session;
   };
@@ -123,6 +126,9 @@ app.get("/", function (req, res) {
 app.post("/quiz-submit", function (req, res) {
   //async db function handler
   callerFunQuizResults(req, res);
+  var endTime = performance.now();
+  req.session.quiztime= endTime - startTime;
+  console.log(`Time to complete quiz took ${endTime - startTime} milliseconds`)
 });
 
 //store quiz results into db function
