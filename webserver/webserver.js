@@ -21,7 +21,7 @@ var mssql = require("mssql");
 var app = express();
 
 var cookieAllowed = false;
-const { performance } = require('perf_hooks');
+const { performance } = require("perf_hooks");
 var startTime = {};
 
 //Local modules required
@@ -29,9 +29,9 @@ var form = require("./form-reader.js");
 var sql_api = require("./sql_api");
 
 //Server details
-const { allowedNodeEnvironmentFlags } = require('process');
-const { resolve } = require('path');
-const { Cookie } = require('express-session');
+const { allowedNodeEnvironmentFlags } = require("process");
+const { resolve } = require("path");
+const { Cookie } = require("express-session");
 var port = 8080;
 const key_array = [
   "suggestions",
@@ -81,19 +81,21 @@ var connection = mssql.connect(options);
 var sessionStore = new MSSQLStore(options, connection);
 var session;
 
-//Declare attributes of client session 
-app.use(expSessions({
-  secret: "secret key to sign cookie",
-  saveUninitialized: true,
-  resave: false,
-  store: sessionStore,
-  cookie: {
-    maxAge: 1800000,
-    secure: false,
-    httpOnly: false,
-    sameSite: 'lax'
-  },
-}));
+//Declare attributes of client session
+app.use(
+  expSessions({
+    secret: "secret key to sign cookie",
+    saveUninitialized: true,
+    resave: false,
+    store: sessionStore,
+    cookie: {
+      maxAge: 1800000,
+      secure: false,
+      httpOnly: false,
+      sameSite: "lax",
+    },
+  })
+);
 
 //Server creation and listening on port number. This is called automatically when this module is initialised
 app.listen(port, () => {
@@ -109,14 +111,13 @@ sql_api.connect2DB();
 
 //Landing page when a client access the server
 app.get("/", function (req, res) {
-  startTime = (performance.now().toFixed(0) / 1000);
-  if(req.session.id){
+  startTime = performance.now().toFixed(0) / 1000; //Starts timing user quiz completion in seconds
+  if (req.session.id) {
     session = req.session;
-  };
-  res.cookie(`Cookie token name`, session.id, {
-  });
-  req.session.user= "guest";
-  req.session.purchase_vist= false;
+  }
+  res.cookie(`Cookie token name`, session.id, {});
+  req.session.user = "guest";
+  req.session.purchase_vist = false;
   res.render("quiz", {
     cookieAllowed: cookieAllowed,
   });
@@ -126,10 +127,12 @@ app.get("/", function (req, res) {
 app.post("/quiz-submit", function (req, res) {
   //async db function handler
   callerFunQuizResults(req, res);
-  var endTime = (performance.now().toFixed(0) / 1000);
+  var endTime = performance.now().toFixed(0) / 1000;
   var totalTime = endTime.toFixed(0) - startTime.toFixed(0);
-  req.session.quiztime = totalTime;
-  console.log(`Time to complete quiz took ${totalTime} seconds`)
+  if (cookieAllowed) { //If user has accepted cookies
+    req.session.quiztime = totalTime; //Logs total quiz time to user session in seconds
+  }
+  console.log(`Time to complete quiz took ${totalTime} seconds`);
 });
 
 //store quiz results into db function
