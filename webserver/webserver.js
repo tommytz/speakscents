@@ -109,7 +109,7 @@ sql_api.connect2DB();
 
 //Landing page when a client access the server
 app.get("/", function (req, res) {
-  startTime = performance.now();
+  startTime = (performance.now().toFixed(0) / 1000);
   if(req.session.id){
     session = req.session;
   };
@@ -126,9 +126,10 @@ app.get("/", function (req, res) {
 app.post("/quiz-submit", function (req, res) {
   //async db function handler
   callerFunQuizResults(req, res);
-  var endTime = performance.now();
-  req.session.quiztime= endTime - startTime;
-  console.log(`Time to complete quiz took ${endTime - startTime} milliseconds`)
+  var endTime = (performance.now().toFixed(0) / 1000);
+  var totalTime = endTime.toFixed(0) - startTime.toFixed(0);
+  req.session.quiztime = totalTime;
+  console.log(`Time to complete quiz took ${totalTime} seconds`)
 });
 
 //store quiz results into db function
