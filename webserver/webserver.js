@@ -21,7 +21,7 @@ var mssql = require("mssql");
 var app = express();
 
 //Measuring user time
-var cookieAllowed = true;
+var cookieAllowed = false;
 const { performance } = require("perf_hooks");
 var startTime = {};
 
@@ -116,7 +116,7 @@ sql_api.connect2DB();
 
 
 
-app.get("/", function (req, res) {
+app.get("/", async function (req, res) {
   startTime = performance.now().toFixed(0) / 1000; //Starts timing user quiz completion in seconds
 
   var name = "";
@@ -127,56 +127,27 @@ app.get("/", function (req, res) {
     req.session.purchase_vist = false;
     console.log(req.session.user);
   
-
-    res.cookie(`Cookie token name`, req.session.id, {
-    });
-
-    res.render("quiz", {
-      cookieAllowed: cookieAllowed,
-      loggedIn: loggedIn
-    });
   }
   else{
-    callerFunUserName(req, res, name);
-  
-  }
-  
- 
-});
+    try {
+    var databaseLogin = await sql_api.getUserName(req.session.user);
 
-async function callerFunUserName(req, res) {
-  console.log("Caller");
-  let loginValidation = await form.valdiateLogin(req, res);
-  
-    var name = loginValidation.name;
-    console.log(name);
-    
-  console.log("After waiting");
-  //direct to the ejs quiz results page
+    name = databaseLogin.name;
+  } catch (error) {
+    console.log(error);
+  }
+  }
   res.cookie(`Cookie token name`, req.session.id, {
   });
-
   res.render("quiz", {
     cookieAllowed: cookieAllowed,
     loggedIn: loggedIn,
     name: name
   });
+ 
+});
 
 
-}
-
-function getUserName(req, res) {
-  return new Promise((resolve, reject) => {
-    //get form quiz results and then insert to db
-
-    let loginValidation = form.valdiateLogin(req, res);
-    var name = loginValidation.name;
-    console.log(name);
-    setTimeout(() => {
-      resolve(name);
-    }, 500);
-  });
-}
 
 
 
@@ -300,7 +271,5 @@ app.get("/shop", function (req, res) {
 app.get("/acceptCookie", function (req, res) {
   cookieAllowed = true;
   console.log("cookie allowed");
-  res.render("quiz", {
-    cookieAllowed: cookieAllowed,
-  });
+  res.redirect('/');
 });

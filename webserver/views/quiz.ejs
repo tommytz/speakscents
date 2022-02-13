@@ -30,7 +30,7 @@
         <a href="/login"><button type="button" class="btn btn-outline-dark">Login</button></a>
         <%}
         else{%>
-          <p>Logged in as <% name %></p>
+          <p>Logged in as <%=name %></p>
           <a href="/logout"><button type="button" class="btn btn-outline-dark">Logout</button></a>
           <%}%>
         <a href="/shop"><button type="button" class="btn btn-outline-dark">View Shop</button></a>
@@ -144,7 +144,7 @@
           </li>
         </ol>
 
-        <button type="submit" id="submit_btn">Submit Form</button>
+        <button type="submit" id="submit_btn" class="btn btn-outline-dark" >Submit Form</button>
       </form>
 
     </div>
