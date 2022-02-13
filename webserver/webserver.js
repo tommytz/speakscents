@@ -22,6 +22,8 @@ var app = express();
 
 var cookieAllowed = false;
 
+var loggedIn = false;
+
 //Local modules required
 var form = require("./form-reader.js");
 var sql_api = require("./sql_api");
@@ -109,9 +111,11 @@ sql_api.connect2DB();
 app.get("/", function (req, res) { 
   
   session = req.session;
-  if(!req.session.user){
-    req.session.user= "Guest: "+ Date();
+  if(!loggedIn){
+
+    req.session.user= 111;
     req.session.purchase_vist= false;
+    console.log(req.session.user);
   
   };
   res.cookie(`Cookie token name`, req.session.id, {
@@ -181,6 +185,8 @@ app.post("/login-submit", async function (req, res) {
     // sets a cookie with the user's info
     req.session.user = loginValidation.id;
 
+    loggedIn = true;
+
     console.log(loginValidation.id);
     console.log("login successful" + loginValidation.name);
     console.log(req.session.user);
@@ -202,6 +208,7 @@ app.post("/login-submit", async function (req, res) {
 
 //Logout (forces cookies and session to clear from browser)
 app.get("/logout", (req, res) => {
+  loggedIn = false;
   req.session.destroy();
   res.redirect("/");
 });
