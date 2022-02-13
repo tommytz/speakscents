@@ -111,20 +111,65 @@ sql_api.connect2DB();
 app.get("/", function (req, res) { 
   
   session = req.session;
+  var name = "";
   if(!loggedIn){
 
     req.session.user= 111;
     req.session.purchase_vist= false;
     console.log(req.session.user);
   
-  };
+
+    res.cookie(`Cookie token name`, req.session.id, {
+    });
+
+    res.render("quiz", {
+      cookieAllowed: cookieAllowed,
+      loggedIn: loggedIn
+    });
+  }
+  else{
+    callerFunUserName(req, res, name);
+  
+  }
+  
+ 
+});
+
+async function callerFunUserName(req, res) {
+  console.log("Caller");
+  let loginValidation = await form.valdiateLogin(req, res);
+  
+    var name = loginValidation.name;
+    console.log(name);
+    
+  console.log("After waiting");
+  //direct to the ejs quiz results page
   res.cookie(`Cookie token name`, req.session.id, {
   });
-  
+
   res.render("quiz", {
     cookieAllowed: cookieAllowed,
+    loggedIn: loggedIn,
+    name: name
   });
-});
+
+
+}
+
+function getUserName(req, res) {
+  return new Promise((resolve, reject) => {
+    //get form quiz results and then insert to db
+
+    let loginValidation = form.valdiateLogin(req, res);
+    var name = loginValidation.name;
+    console.log(name);
+    setTimeout(() => {
+      resolve(name);
+    }, 500);
+  });
+}
+
+
 
 //This request gets form data from the quiz and stores data in the database
 app.post("/quiz-submit", function (req, res) {

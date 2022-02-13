@@ -24,8 +24,15 @@
     
 
     <div id="reg">
-      <p>Want to register? <a href="/registration"> Registration Page </a><br></p>
+      
+      <% if(!loggedIn){%>
+        <p>Want to register? <a href="/registration"> Registration Page </a><br></p>
         <a href="/login"><button type="button" class="btn btn-outline-dark">Login</button></a>
+        <%}
+        else{%>
+          <p>Logged in as <% name %></p>
+          <a href="/logout"><button type="button" class="btn btn-outline-dark">Logout</button></a>
+          <%}%>
         <a href="/shop"><button type="button" class="btn btn-outline-dark">View Shop</button></a>
 
     </div>
