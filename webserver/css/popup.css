@@ -1,0 +1,73 @@
+*, *::after, *::before {
+    box-sizing: border-box;
+}
+
+/* Positions the popup. */
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: 1000ms ease-in-out;
+    border: 1px solid black;
+    border-radius: 10px;
+    z-index: 10; /*Allows the popup to be above everything else*/
+    background-color: white;
+    width: 400px;
+    max-width: 70%;
+}
+
+/* Popup class, active */
+.popup.active {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Popup header area styling */
+.popup-header {
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px black solid;
+}
+
+/* Popup title styling */
+.popup-header .popup-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+/* Close button styling */
+.popup-header .close-button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+/* Styling popup content*/
+.popup-body {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px black solid;
+}
+
+#overlay {
+    position: fixed;
+    opacity: 0;
+    transition: 1000ms ease-in-out;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.3);
+    pointer-events: none;
+}
+
+#overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}

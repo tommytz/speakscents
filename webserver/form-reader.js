@@ -17,6 +17,7 @@
  */
 
 var sql_api = require('./sql_api');
+var fs = require("fs");
 
 
 const get_results = function (body) {
@@ -127,4 +128,45 @@ async function valdiateLogin(req, res) {
   return loginObject;
 }
 
-module.exports = { get_jsonAsList, get_jsonAsListOfValues, get_jsonAsString, get_results, valdiateLogin };
+//Gets all images in the css folder and returns an array.
+function getImages(){
+  return new Promise((resolve, reject) => {
+    fs.readdir(__dirname + "/css", (err, file) => {
+      if(err){
+        
+        
+        reject(err);
+      } else {
+        let images = [];
+        file.forEach((file) => {
+          
+          if(file.toString().startsWith("perfume")){
+            images.push(file);
+          
+          }
+        });
+        
+        resolve(images);
+      }
+    });
+  })
+}
+
+//Serves a different random image
+async function serveImage(){
+  try{
+    let images = await getImages();
+    let selectedImage = images[getRandomInt(images.length)];
+
+    return selectedImage;
+  } catch (err){
+    console.log("Error: " + err);
+  }
+}
+
+//Returns random number based on max value.
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
+module.exports = { get_jsonAsList, get_jsonAsListOfValues, get_jsonAsString, get_results, valdiateLogin, serveImage };
