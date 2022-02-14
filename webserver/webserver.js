@@ -26,6 +26,7 @@ const { performance } = require("perf_hooks");
 var startTime = {};
 
 var loggedIn = false;
+var guestUser = false;
 
 //Local modules required
 var form = require("./form-reader.js");
@@ -120,14 +121,15 @@ app.get("/", async function (req, res) {
   var name = "";
   session = req.session;
   //if no logged in state then set user to guest
-  if (!loggedIn) {
+  if (!loggedIn && !guestUser) {
 
     req.session.user = 111;
     req.session.purchase_vist = false;
     console.log(req.session.user);
+    guestUser = true;
   
   }
-  else{
+  else if(loggedIn){
     try {
     var databaseLogin = await sql_api.getUserName(req.session.user);
 
@@ -214,6 +216,7 @@ app.post("/login-submit", async function (req, res) {
     req.session.user = loginValidation.id;
 
     loggedIn = true;
+    guestUser = false;
 
     console.log(loginValidation.id);
     console.log("login successful" + loginValidation.name);
