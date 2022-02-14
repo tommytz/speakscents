@@ -220,8 +220,7 @@ app.post("/login-submit", async function (req, res) {
 
     console.log(loginValidation.id);
     console.log("login successful" + loginValidation.name);
-    console.log(req.session.user);
-    console.log(req.session.id);
+  
 
     // Res page with results
     let quiz_data = await sql_api.readUserQuizEntry(req.session.user);
@@ -235,6 +234,29 @@ app.post("/login-submit", async function (req, res) {
   } else {
     res.send("Invalid Login");
   }
+});
+
+//profile page
+app.get("/profile", async function (req, res) {
+  // Res page with results
+  let quiz_data = await sql_api.readUserQuizEntry(req.session.user);
+
+  var databaseLogin = await sql_api.getUserName(req.session.user);
+
+  let results = {
+    name: databaseLogin.name,
+    email: databaseLogin.email,
+  };
+
+
+  i = 0;
+  key_array.forEach((key) => {
+    results[key] = quiz_data[i];
+    i++;
+  });
+  console.log("results"+results[0] + quiz_data);
+  res.render("profile", results);
+
 });
 
 //Logout (forces cookies and session to clear from browser)
@@ -264,7 +286,10 @@ app.get("/shop", function (req, res) {
   req.session.purchase_vist = true;
   console.log(req.session.id);
   console.log(req.session.purchase_vist);
-  res.render("shop");
+  res.render("shop", {
+  loggedIn: loggedIn
+
+  });
 });
 
 //Accept Cookie
