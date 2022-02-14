@@ -226,7 +226,6 @@ app.get("/logout", (req, res) => {
 });
 
 //This function returns the saved results from the DB and presents it back to the user
-// WORK IN PROGRESS 02/02/2022 11:39am
 app.get("/quiz-results", async function (req, res) {
   //Obatining data from database. Async function, returns promise.
   let quiz_data = await sql_api.readQuizEntry();
@@ -255,4 +254,22 @@ app.get("/acceptCookie", function (req, res) {
   res.render("quiz", {
     cookieAllowed: cookieAllowed,
   });
+});
+
+// Loads scripts for popup
+app.get('/popupscript', (req, res) => {
+  res.sendFile(__dirname + "/popup.js");
+});
+
+// Loads css for popup
+app.get('/popupcss', (req, res) => {
+  res.sendFile(__dirname + "/css/popup.css");
+});
+
+// Load random image for popup
+app.get('/random-scent', async (req, res) => {
+  let randomImage = await form.serveImage();
+  let randomScent = "/css/" + randomImage;
+
+  res.sendFile(__dirname + randomScent);
 });
