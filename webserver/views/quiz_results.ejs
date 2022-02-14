@@ -36,8 +36,8 @@
       <p><%=scentStyles%></p>
 
       
-    
-    <div class="popup" id="popup">
+    <!-- Popup for suggested scents, initially hidden from CSS file. -->
+    <div class="popup active" id="popup">
         <div class="popup-header">
             <div class="popup-title">Your Suggested Scents</div>
             <button data-close-button class="close-button">&times;</button>
@@ -46,7 +46,7 @@
             <img src="http://localhost:8080/random-scent" alt="scent-pic">
         </div>
     </div>
-    <div id="overlay"></div>
+    <div id="overlay" class="active"></div>
   
       
     <script type="text/javascript" src="http://localhost:8080/popupscript"></script>
