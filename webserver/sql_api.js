@@ -240,6 +240,28 @@ function validateJSONPost(unparsedJSON) {
   return json_array;
 }
 
+//Retrieves final row from customer DB and returns to profile page
+function getUserName(userid) {
+  let account_values = {};
+  let sql = `SELECT *  FROM [dbo].[user_accounts]
+  WHERE customer_id='`+ userid + `';`;
+  return new Promise((resolve, reject) => {
+    const request = new Request(sql, (err) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(account_values);
+    });
+
+    request.on("row", function (columns) { //on the returned row(s)
+      columns.forEach(function (column) { //for each of the columns in the row(s)
+        account_values[column.metadata.colName] = column.value;
+      });
+    });
+
+    connection.execSql(request);
+  });
+}
 
 //Retrieves final row from customer DB and returns to profile page
 function readLogin(email) {
@@ -265,4 +287,4 @@ function readLogin(email) {
   });
 }
 
-module.exports = { connect2DB, readUserQuizEntry, insertToDatabase, queryFromDatabase, readQuizEntry, insertToDatabaseRegistration, readLogin, connection };
+module.exports = { connect2DB, readUserQuizEntry, insertToDatabase, queryFromDatabase, readQuizEntry, insertToDatabaseRegistration, readLogin, getUserName, connection };

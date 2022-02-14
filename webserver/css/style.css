@@ -23,21 +23,7 @@ body {
     margin: auto;
 }
 
-#submit_btn {
-    background-color: #fdfdfd;
-    border: none;
-    color: rgb(30, 12, 129);
-    padding: 20px;
-    text-align: center;
-    text-decoration: none;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    font-size: 16px;
-    margin: 4px 2px;
-    padding: 10px;
-    border-radius: 25px;
-}
+
 
 ul {
     list-style: none;

@@ -21,7 +21,7 @@ var mssql = require("mssql");
 var app = express();
 
 //Measuring user time
-var cookieAllowed = true;
+var cookieAllowed = false;
 const { performance } = require("perf_hooks");
 var startTime = {};
 
@@ -113,24 +113,43 @@ sql_api.connect2DB();
  * *************************************************************************/
 
 //Landing page when a client access the server
-app.get("/", function (req, res) {
+
+
+
+app.get("/", async function (req, res) {
   startTime = performance.now().toFixed(0) / 1000; //Starts timing user quiz completion in seconds
 
+  var name = "";
   session = req.session;
   if (!loggedIn) {
 
     req.session.user = 111;
     req.session.purchase_vist = false;
     console.log(req.session.user);
+  
+  }
+  else{
+    try {
+    var databaseLogin = await sql_api.getUserName(req.session.user);
 
-  };
+    name = databaseLogin.name;
+  } catch (error) {
+    console.log(error);
+  }
+  }
   res.cookie(`Cookie token name`, req.session.id, {
   });
-
   res.render("quiz", {
     cookieAllowed: cookieAllowed,
+    loggedIn: loggedIn,
+    name: name
   });
+ 
 });
+
+
+
+
 
 //This request gets form data from the quiz and stores data in the database
 app.post("/quiz-submit", function (req, res) {
@@ -251,9 +270,7 @@ app.get("/shop", function (req, res) {
 app.get("/acceptCookie", function (req, res) {
   cookieAllowed = true;
   console.log("cookie allowed");
-  res.render("quiz", {
-    cookieAllowed: cookieAllowed,
-  });
+  res.redirect('/');
 });
 
 // Loads scripts for popup
