@@ -20,18 +20,21 @@ var MSSQLStore = require("connect-mssql-v2");
 var mssql = require("mssql");
 var app = express();
 
+//Measuring user time
+var cookieAllowed = true;
+const { performance } = require("perf_hooks");
+var startTime = {};
 
-
-var cookieAllowed = false;
+var loggedIn = false;
 
 //Local modules required
 var form = require("./form-reader.js");
 var sql_api = require("./sql_api");
 
 //Server details
-const { allowedNodeEnvironmentFlags } = require('process');
-const { resolve } = require('path');
-const { Cookie } = require('express-session');
+const { allowedNodeEnvironmentFlags } = require("process");
+const { resolve } = require("path");
+const { Cookie } = require("express-session");
 var port = 8080;
 const key_array = [
   "suggestions",
@@ -81,19 +84,21 @@ var connection = mssql.connect(options);
 var sessionStore = new MSSQLStore(options, connection);
 var session;
 
-//Declare attributes of client session 
-app.use(expSessions({
-  secret: "secret key to sign cookie",
-  saveUninitialized: true,
-  resave: false,
-  store: sessionStore,
-  cookie: {
-    maxAge: 1800000,
-    secure: false,
-    httpOnly: false,
-    sameSite: 'lax'
-  },
-}));
+//Declare attributes of client session
+app.use(
+  expSessions({
+    secret: "secret key to sign cookie",
+    saveUninitialized: true,
+    resave: false,
+    store: sessionStore,
+    cookie: {
+      maxAge: 1800000,
+      secure: false,
+      httpOnly: false,
+      sameSite: "lax",
+    },
+  })
+);
 
 //Server creation and listening on port number. This is called automatically when this module is initialised
 app.listen(port, () => {
@@ -108,14 +113,20 @@ sql_api.connect2DB();
  * *************************************************************************/
 
 //Landing page when a client access the server
-app.get("/", function (req, res) { 
-  if(req.session.id){
-    session = req.session;
+app.get("/", function (req, res) {
+  startTime = performance.now().toFixed(0) / 1000; //Starts timing user quiz completion in seconds
+
+  session = req.session;
+  if (!loggedIn) {
+
+    req.session.user = 111;
+    req.session.purchase_vist = false;
+    console.log(req.session.user);
+
   };
-  res.cookie(`Cookie token name`, session.id, {
+  res.cookie(`Cookie token name`, req.session.id, {
   });
-  req.session.user= "guest";
-  req.session.purchase_vist= false;
+
   res.render("quiz", {
     cookieAllowed: cookieAllowed,
   });
@@ -125,6 +136,12 @@ app.get("/", function (req, res) {
 app.post("/quiz-submit", function (req, res) {
   //async db function handler
   callerFunQuizResults(req, res);
+  var endTime = performance.now().toFixed(0) / 1000;
+  var totalTime = endTime.toFixed(0) - startTime.toFixed(0);
+  if (cookieAllowed) { //If user has accepted cookies
+    req.session.quiztime = totalTime; //Logs total quiz time to user session in seconds
+  }
+  console.log(`Time to complete quiz took ${totalTime} seconds`);
 });
 
 //store quiz results into db function
@@ -132,7 +149,8 @@ function storeQuizResults(req, res) {
   return new Promise((resolve, reject) => {
     //get form quiz results and then insert to db
 
-    sql_api.insertToDatabase(req.body);
+    console.log(req.session.user);
+    sql_api.insertToDatabase(req.body, req.session.user);
     setTimeout(() => {
       resolve();
     }, 500);
@@ -179,13 +197,15 @@ app.post("/login-submit", async function (req, res) {
     // sets a cookie with the user's info
     req.session.user = loginValidation.id;
 
+    loggedIn = true;
+
     console.log(loginValidation.id);
     console.log("login successful" + loginValidation.name);
     console.log(req.session.user);
     console.log(req.session.id);
 
     // Res page with results
-    let quiz_data = await sql_api.readQuizEntry();
+    let quiz_data = await sql_api.readUserQuizEntry(req.session.user);
 
     i = 0;
     key_array.forEach((key) => {
@@ -200,6 +220,7 @@ app.post("/login-submit", async function (req, res) {
 
 //Logout (forces cookies and session to clear from browser)
 app.get("/logout", (req, res) => {
+  loggedIn = false;
   req.session.destroy();
   res.redirect("/");
 });
@@ -235,10 +256,8 @@ app.get("/acceptCookie", function (req, res) {
   });
 });
 
-
-
 // Loads scripts for popup
-app.get('/popupscript', (req,res) => {
+app.get('/popupscript', (req, res) => {
   res.sendFile(__dirname + "/popup.js");
 });
 
