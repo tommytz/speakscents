@@ -10,11 +10,13 @@ label{
     vertical-align: top;
 }
 
+
 .reg_list {
     padding: 10px;
     margin: 10px;
 }
 
+/* form style */
 .reg_form {
     border: 2px solid rgb(255, 135, 23);
     border-radius: 25px;
@@ -27,6 +29,7 @@ label{
 
 }
 
+/* Heading style */
 #heading {
     background-color: rgb(255, 135, 23);
 

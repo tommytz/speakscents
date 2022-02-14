@@ -14,16 +14,13 @@ p{
 
 button:hover {
     opacity: 0.8;
-  }
-
+}
 
 body {
     background-color: rgb(255, 211, 169);
     font-family: Arial, Helvetica, sans-serif;
     margin: auto;
 }
-
-
 
 ul {
     list-style: none;

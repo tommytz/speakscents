@@ -130,7 +130,7 @@ function readQuizEntry() {
     connection.execSql(request);
   });
 }
-//TODO
+
 // Retrieves final row from customer DB for sepcific user and returns to quiz results page
 function readUserQuizEntry(userID) {
   var result = [];
@@ -160,6 +160,7 @@ function readUserQuizEntry(userID) {
   });
 }
 
+//register a user and store their data into the database
 const insertToDatabaseRegistration = function (unparsedJSON) {
   console.log("Inserting into Table...");
   // var parsedJSON = JSON.parse(unparsedJSON);

@@ -114,13 +114,12 @@ sql_api.connect2DB();
 
 //Landing page when a client access the server
 
-
-
 app.get("/", async function (req, res) {
   startTime = performance.now().toFixed(0) / 1000; //Starts timing user quiz completion in seconds
 
   var name = "";
   session = req.session;
+  //if no logged in state then set user to guest
   if (!loggedIn) {
 
     req.session.user = 111;
@@ -137,8 +136,10 @@ app.get("/", async function (req, res) {
     console.log(error);
   }
   }
+  //set cookie string to the session id
   res.cookie(`Cookie token name`, req.session.id, {
   });
+  //render the quiz ejs
   res.render("quiz", {
     cookieAllowed: cookieAllowed,
     loggedIn: loggedIn,
@@ -146,10 +147,6 @@ app.get("/", async function (req, res) {
   });
  
 });
-
-
-
-
 
 //This request gets form data from the quiz and stores data in the database
 app.post("/quiz-submit", function (req, res) {
@@ -248,7 +245,6 @@ app.get("/profile", async function (req, res) {
     email: databaseLogin.email,
   };
 
-
   i = 0;
   key_array.forEach((key) => {
     results[key] = quiz_data[i];
@@ -283,9 +279,9 @@ app.get("/quiz-results", async function (req, res) {
 
 //View Shop
 app.get("/shop", function (req, res) {
-  req.session.purchase_vist = true;
-  console.log(req.session.id);
-  console.log(req.session.purchase_vist);
+  //if cookies allowed, track that they viewed the purchase page
+  if(cookieAllowed){req.session.purchase_vist = true;}
+
   res.render("shop", {
   loggedIn: loggedIn
 
