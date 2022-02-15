@@ -62,7 +62,7 @@ const insertToDatabase = function (jsonData, custID) {
 
   // Constructing the request for the insert query
   var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, `;
-  var values = `VALUES ('`+custID+`', 'answer', 'cluster', '1', `;
+  var values = `VALUES (@custID, 'answer', 'cluster', '1', `;
   query += generateQuizCols(answer_array) + values + generateQuizParams(answer_array);
 
   const request = new Request(query, (err) => {
@@ -74,6 +74,7 @@ const insertToDatabase = function (jsonData, custID) {
     }
   });
 
+  request.addParameter("custID", TYPES.Int, custID);
   for (var i = 0; i < answer_array.length; i++) {
     request.addParameter(`q${i + 1}`, TYPES.VarChar, answer_array[i]);
   }
@@ -134,9 +135,9 @@ function readQuizEntry() {
 // Retrieves final row from customer DB for sepcific user and returns to quiz results page
 function readUserQuizEntry(userID) {
   var result = [];
-  
+
   let sql = `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM [dbo].[quiz_results] 
-  WHERE customer_id='`+userID+ `' ORDER BY quiz_results.quiz_id DESC;`;
+  WHERE customer_id='`+ userID + `' ORDER BY quiz_results.quiz_id DESC;`;
 
 
   return new Promise((resolve, reject) => {
