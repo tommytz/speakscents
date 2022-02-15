@@ -49,9 +49,8 @@ const get_results = function (body) {
   return data_JSON;
 };
 
-//
+
 //This method takes form data and returns an array list of [key,value]
-//
 const get_jsonAsList = function (body) {
 
   var results = [];
@@ -65,9 +64,8 @@ const get_jsonAsList = function (body) {
   return results;
 };
 
-//
+
 //This method takes form data and returns an array list of [values] only
-//
 const get_jsonAsListOfValues = function (body) {
 
   var results = [];
@@ -81,9 +79,8 @@ const get_jsonAsListOfValues = function (body) {
 };
 
 
-//
-//This method takes form data and returns json string
-//
+
+//This method takes form data and returns json strin
 const get_jsonAsString = function (body) {
 
   var data = JSON.stringify(body);

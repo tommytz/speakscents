@@ -10,7 +10,6 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var multer = require("multer");
-var flash = require("connect-flash");
 var ejs = require("ejs");
 var upload = multer();
 var helmet = require("helmet");
@@ -51,11 +50,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(upload.array());
 app.use(express.static("public"));
-app.use(flash());
-// app.use(function (req, res, next) { //Needed for connect-flash and session data, please leave for now AdL.
-//   res.locals.messages = require('express-messages')(req, res);
-//   next();
-// });
 app.use("/css", express.static(__dirname + "/css"));
 app.use("/static_scripts", express.static(__dirname + "/static_scripts"));
 
