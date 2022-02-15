@@ -116,10 +116,14 @@ app.get("/", async function (req, res) {
   session = req.session;
   //if no logged in state then set user to guest
   if (!loggedIn && !guestUser) {
+
+    req.session.user = 126;
+
     console.log("This only runs once");
-    req.session.user = 111;
+
     req.session.purchase_vist = false;
     console.log(req.session.user);
+    console.log(req.session.id);
     guestUser = true;
 
     req.session.shop_click = {};
