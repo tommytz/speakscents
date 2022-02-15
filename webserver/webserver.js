@@ -116,21 +116,23 @@ app.get("/", async function (req, res) {
   session = req.session;
   //if no logged in state then set user to guest
   if (!loggedIn && !guestUser) {
-
+    console.log("This only runs once");
     req.session.user = 111;
     req.session.purchase_vist = false;
     console.log(req.session.user);
     guestUser = true;
-  
-  }
-  else if(loggedIn){
-    try {
-    var databaseLogin = await sql_api.getUserName(req.session.user);
 
-    name = databaseLogin.name;
-  } catch (error) {
-    console.log(error);
+    req.session.shop_click = {};
+
   }
+  else if (loggedIn) {
+    try {
+      var databaseLogin = await sql_api.getUserName(req.session.user);
+
+      name = databaseLogin.name;
+    } catch (error) {
+      console.log(error);
+    }
   }
   //set cookie string to the session id
   res.cookie(`Cookie token name`, req.session.id, {
@@ -141,7 +143,7 @@ app.get("/", async function (req, res) {
     loggedIn: loggedIn,
     name: name
   });
- 
+
 });
 
 //This request gets form data from the quiz and stores data in the database
@@ -214,7 +216,7 @@ app.post("/login-submit", async function (req, res) {
 
     console.log(loginValidation.id);
     console.log("login successful" + loginValidation.name);
-  
+
 
     // Res page with results
     let quiz_data = await sql_api.readUserQuizEntry(req.session.user);
@@ -247,7 +249,7 @@ app.get("/profile", async function (req, res) {
     results[key] = quiz_data[i];
     i++;
   });
-  console.log("results"+results[0] + quiz_data);
+  console.log("results" + results[0] + quiz_data);
   res.render("profile", results);
 
 });
@@ -276,12 +278,25 @@ app.get("/quiz-results", async function (req, res) {
 //View Shop
 app.get("/shop", function (req, res) {
   //if cookies allowed, track that they viewed the purchase page
-  if(cookieAllowed){req.session.purchase_vist = true;}
+  if (cookieAllowed) { req.session.purchase_vist = true; }
 
   res.render("shop", {
-  loggedIn: loggedIn
+    loggedIn: loggedIn
 
   });
+});
+
+// Shop item clicked
+app.post("/click", function (req, res) {
+  let client_click = req.body.click;
+  console.log(req.session.id + " received: " + client_click);
+
+  if (!req.session.shop_click.hasOwnProperty(client_click)) {
+    req.session.shop_click[client_click] = 0;
+  }
+  req.session.shop_click[client_click]++;
+  console.log(req.session);
+  req.session.save();
 });
 
 //Accept Cookie
