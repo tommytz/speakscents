@@ -1,4 +1,4 @@
-const shop_buttons = document.querySelectorAll("button[value]");
+const shop_buttons = document.querySelectorAll("img[alt]");
 console.log(shop_buttons);
 
 shop_buttons.forEach(sb => {

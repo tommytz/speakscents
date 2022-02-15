@@ -122,11 +122,13 @@ app.get("/", async function (req, res) {
   session = req.session;
   //if no logged in state then set user to guest
   if (!loggedIn && !guestUser) {
-
+    console.log("This only runs once");
     req.session.user = 111;
     req.session.purchase_vist = false;
     console.log(req.session.user);
     guestUser = true;
+
+    req.session.shop_click = {};
 
   }
   else if (loggedIn) {
@@ -300,6 +302,7 @@ app.post("/click", function (req, res) {
   }
   req.session.shop_click[client_click]++;
   console.log(req.session);
+  req.session.save();
 });
 
 //Accept Cookie
