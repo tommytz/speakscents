@@ -123,7 +123,7 @@ app.get("/", async function (req, res) {
   //if no logged in state then set user to guest
   if (!loggedIn && !guestUser) {
 
-    req.session.user = 126;
+    req.session.user = 129;
     req.session.purchase_vist = false;
     console.log(req.session.user);
     console.log(req.session.id);
