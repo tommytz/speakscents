@@ -62,7 +62,7 @@ const insertToDatabase = function (jsonData, custID) {
 
   // Constructing the request for the insert query
   var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, `;
-  var values = `VALUES ('`+custID+`', 'answer', 'cluster', '1', `;
+  var values = `VALUES (@customer_id, 'answer', 'cluster', '1', `;
   query += generateQuizCols(answer_array) + values + generateQuizParams(answer_array);
 
   const request = new Request(query, (err) => {
@@ -77,6 +77,9 @@ const insertToDatabase = function (jsonData, custID) {
   for (var i = 0; i < answer_array.length; i++) {
     request.addParameter(`q${i + 1}`, TYPES.VarChar, answer_array[i]);
   }
+
+  request.addParameter('customer_id', TYPES.Int, custID);
+
   connection.execSql(request);
 };
 
@@ -136,7 +139,7 @@ function readUserQuizEntry(userID) {
   var result = [];
   
   let sql = `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM [dbo].[quiz_results] 
-  WHERE customer_id='`+userID+ `' ORDER BY quiz_results.quiz_id DESC;`;
+  WHERE customer_id=@customer_id ORDER BY quiz_results.quiz_id DESC;`;
 
 
   return new Promise((resolve, reject) => {
@@ -155,6 +158,8 @@ function readUserQuizEntry(userID) {
         result.push(temp);
       });
     });
+
+    request.addParameter('customer_id', TYPES.Int, userID);
 
     connection.execSql(request);
   });
@@ -245,7 +250,7 @@ function validateJSONPost(unparsedJSON) {
 function getUserName(userid) {
   let account_values = {};
   let sql = `SELECT *  FROM [dbo].[user_accounts]
-  WHERE customer_id='`+ userid + `';`;
+  WHERE customer_id=@customer_id;`;
   return new Promise((resolve, reject) => {
     const request = new Request(sql, (err) => {
       if (err) {
@@ -259,6 +264,8 @@ function getUserName(userid) {
         account_values[column.metadata.colName] = column.value;
       });
     });
+
+    request.addParameter('customer_id', TYPES.Int, userid);
 
     connection.execSql(request);
   });
@@ -268,7 +275,7 @@ function getUserName(userid) {
 function readLogin(email) {
   let account_values = {};
   let sql = `SELECT *  FROM [dbo].[user_accounts]
-  WHERE email='`+ email + `';`;
+  WHERE email=@email;`;
 
   return new Promise((resolve, reject) => {
     const request = new Request(sql, (err) => {
@@ -283,6 +290,8 @@ function readLogin(email) {
         account_values[column.metadata.colName] = column.value;
       });
     });
+
+    request.addParameter('email', TYPES.VarChar, email);
 
     connection.execSql(request);
   });

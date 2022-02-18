@@ -191,12 +191,12 @@ app.get("/registration", function (req, res) {
   res.sendFile(__dirname + "/registration.html");
 });
 
-//Submit registered data and returns them to the quiz.html page
+//Submit registered data and returns them to the quiz ejs page
 app.post("/registration-submit", function (req, res) {
   var jsonObject = req.body;
 
   sql_api.insertToDatabaseRegistration(jsonObject);
-  res.sendFile(__dirname + "/quiz.html");
+  res.redirect('/');
 });
 
 //login page
