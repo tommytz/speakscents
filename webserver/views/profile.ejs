@@ -1,48 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+
+  <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- bootstrap style import -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@200&display=swap');
-        </style>
+      @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@200&display=swap');
+    </style>
 
-        <!-- Bootstrap CSS v5.0.2 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"  integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-      <!-- general style settings -->
-      <link rel="stylesheet" href="/css/style.css"> 
-    
+    <!-- Bootstrap CSS v5.0.2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- general style settings -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Popup -->
+    <link rel="stylesheet" href="http://localhost:8080/popupcss">
     <title>Login Successful</title>
-</head>
-<body>
-  <a href="/"><button type="button" class="btn btn-outline-dark" >Retake Quiz</button></a>
-  <a href="/logout"><button type="button" class="btn btn-outline-dark" >Logout</button></a>
-  <a href="/shop"><button type="button" class="btn btn-outline-dark">View Shop</button></a>
-  <h1>Your Details</h1>
-  <h2>Name </h2>
-  <p><%= name %></p>
-  <h2>Email </h2>
-  <p><%= email %></p>
+  </head>
 
-  <h1>Your Quiz Results</h1>
-  <h2>Suggested Scents</h2>
-  <p><%= suggestions %></p>
-  <h2>Preferred when to wear: </h2>
-  <p><%= time %></p>
-  <h2>Preferred season to wear:</h2>
-  <p><%=season %></p>
-  <h2>Preferred scent strength: </h2>
-  <p><%= scentStrength %></p>
-  <h2>Preferred scent mood: </h2>
-  <p><%= scentMood %></p>
-  <h2>Preferred scent style:</h2>
-  <p><%= scentStyles %></p>
+  <body>
+    <a href="/"><button type="button" class="btn btn-outline-dark">Retake Quiz</button></a>
+    <a href="/logout"><button type="button" class="btn btn-outline-dark">Logout</button></a>
+    <a href="/shop"><button type="button" class="btn btn-outline-dark">View Shop</button></a>
+    <h1>Your Details</h1>
+    <h2>Name </h2>
+    <p><%= name %></p>
+    <h2>Email </h2>
+    <p><%= email %></p>
 
-  <br>
+    <h1>Your Quiz Results</h1>
+    <h2>Suggested Scents</h2>
+    <p><%= suggestions %></p>
+    <h2>Preferred when to wear: </h2>
+    <p><%= time %></p>
+    <h2>Preferred season to wear:</h2>
+    <p><%=season %></p>
+    <h2>Preferred scent strength: </h2>
+    <p><%= scentStrength %></p>
+    <h2>Preferred scent mood: </h2>
+    <p><%= scentMood %></p>
+    <h2>Preferred scent style:</h2>
+    <p><%= scentStyles %></p>
 
+    <br>
+    <a href="/"><button type="button" class="btn btn-outline-dark">Retake Quiz</button></a>
+    <button data-modal-target="#popup" class="btn btn-outline-dark">Suggested Scent</button>
+    <a href="/logout"><button type="button" class="btn btn-outline-dark">Logout</button></a>
 
-</body>
+    <!-- Popup for suggested scents, initially hidden from CSS file. -->
+    <div class="popup" id="popup">
+      <div class="popup-header">
+        <div class="popup-title">Your Suggested Scents</div>
+        <button data-close-button class="close-button">&times;</button>
+      </div>
+      <div class="popup-body">
+        <img src="http://localhost:8080/random-scent" alt="scent-pic">
+      </div>
+    </div>
+    <div id="overlay"></div>
+
+    <script type="text/javascript" src="http://localhost:8080/popupscript"></script>
+
+  </body>
+
 </html>

@@ -62,7 +62,9 @@ const insertToDatabase = function (jsonData, custID) {
 
   // Constructing the request for the insert query
   var query = `INSERT INTO quiz_results (customer_id, answer_path, cluster, quiz_version, `;
+
   var values = `VALUES (@customer_id, 'answer', 'cluster', '1', `;
+
   query += generateQuizCols(answer_array) + values + generateQuizParams(answer_array);
 
   const request = new Request(query, (err) => {
@@ -137,9 +139,11 @@ function readQuizEntry() {
 // Retrieves final row from customer DB for sepcific user and returns to quiz results page
 function readUserQuizEntry(userID) {
   var result = [];
-  
+
   let sql = `SELECT TOP 1 question_1, question_2, question_3, question_4, question_5, question_6 FROM [dbo].[quiz_results] 
+
   WHERE customer_id=@customer_id ORDER BY quiz_results.quiz_id DESC;`;
+
 
 
   return new Promise((resolve, reject) => {

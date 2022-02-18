@@ -10,7 +10,6 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var multer = require("multer");
-var flash = require("connect-flash");
 var ejs = require("ejs");
 var upload = multer();
 var helmet = require("helmet");
@@ -51,11 +50,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(upload.array());
 app.use(express.static("public"));
-app.use(flash());
-// app.use(function (req, res, next) { //Needed for connect-flash and session data, please leave for now AdL.
-//   res.locals.messages = require('express-messages')(req, res);
-//   next();
-// });
 app.use("/css", express.static(__dirname + "/css"));
 app.use("/static_scripts", express.static(__dirname + "/static_scripts"));
 
@@ -123,21 +117,28 @@ app.get("/", async function (req, res) {
   //if no logged in state then set user to guest
   if (!loggedIn && !guestUser) {
 
+
     req.session.user = 129;
+
+
+    console.log("This only runs once");
+
     req.session.purchase_vist = false;
     console.log(req.session.user);
     console.log(req.session.id);
     guestUser = true;
-  
-  }
-  else if(loggedIn){
-    try {
-    var databaseLogin = await sql_api.getUserName(req.session.user);
 
-    name = databaseLogin.name;
-  } catch (error) {
-    console.log(error);
+    req.session.shop_click = {};
+
   }
+  else if (loggedIn) {
+    try {
+      var databaseLogin = await sql_api.getUserName(req.session.user);
+
+      name = databaseLogin.name;
+    } catch (error) {
+      console.log(error);
+    }
   }
   //set cookie string to the session id
   res.cookie(`Cookie token name`, req.session.id, {
@@ -148,7 +149,7 @@ app.get("/", async function (req, res) {
     loggedIn: loggedIn,
     name: name
   });
- 
+
 });
 
 //This request gets form data from the quiz and stores data in the database
@@ -221,7 +222,7 @@ app.post("/login-submit", async function (req, res) {
 
     console.log(loginValidation.id);
     console.log("login successful" + loginValidation.name);
-  
+
 
     // Res page with results
     let quiz_data = await sql_api.readUserQuizEntry(req.session.user);
@@ -254,7 +255,7 @@ app.get("/profile", async function (req, res) {
     results[key] = quiz_data[i];
     i++;
   });
-  console.log("results"+results[0] + quiz_data);
+  console.log("results" + results[0] + quiz_data);
   res.render("profile", results);
 
 });
@@ -267,7 +268,6 @@ app.get("/logout", (req, res) => {
 });
 
 //This function returns the saved results from the DB and presents it back to the user
-// WORK IN PROGRESS 02/02/2022 11:39am
 app.get("/quiz-results", async function (req, res) {
   //Obatining data from database. Async function, returns promise.
   let quiz_data = await sql_api.readQuizEntry();
@@ -284,12 +284,25 @@ app.get("/quiz-results", async function (req, res) {
 //View Shop
 app.get("/shop", function (req, res) {
   //if cookies allowed, track that they viewed the purchase page
-  if(cookieAllowed){req.session.purchase_vist = true;}
+  if (cookieAllowed) { req.session.purchase_vist = true; }
 
   res.render("shop", {
-  loggedIn: loggedIn
+    loggedIn: loggedIn
 
   });
+});
+
+// Shop item clicked
+app.post("/click", function (req, res) {
+  let client_click = req.body.click;
+  console.log(req.session.id + " received: " + client_click);
+
+  if (!req.session.shop_click.hasOwnProperty(client_click)) {
+    req.session.shop_click[client_click] = 0;
+  }
+  req.session.shop_click[client_click]++;
+  console.log(req.session);
+  req.session.save();
 });
 
 //Accept Cookie
@@ -297,4 +310,22 @@ app.get("/acceptCookie", function (req, res) {
   cookieAllowed = true;
   console.log("cookie allowed");
   res.redirect('/');
+});
+
+// Loads scripts for popup
+app.get('/popupscript', (req, res) => {
+  res.sendFile(__dirname + "/popup.js");
+});
+
+// Loads css for popup
+app.get('/popupcss', (req, res) => {
+  res.sendFile(__dirname + "/css/popup.css");
+});
+
+// Load random image for popup
+app.get('/random-scent', async (req, res) => {
+  let randomImage = await form.serveImage();
+  let randomScent = "/css/" + randomImage;
+
+  res.sendFile(__dirname + randomScent);
 });
