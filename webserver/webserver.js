@@ -117,7 +117,9 @@ app.get("/", async function (req, res) {
   //if no logged in state then set user to guest
   if (!loggedIn && !guestUser) {
 
-    req.session.user = 126;
+
+    req.session.user = 129;
+
 
     console.log("This only runs once");
 
@@ -190,12 +192,12 @@ app.get("/registration", function (req, res) {
   res.sendFile(__dirname + "/registration.html");
 });
 
-//Submit registered data and returns them to the quiz.html page
+//Submit registered data and returns them to the quiz ejs page
 app.post("/registration-submit", function (req, res) {
   var jsonObject = req.body;
 
   sql_api.insertToDatabaseRegistration(jsonObject);
-  res.sendFile(__dirname + "/quiz.html");
+  res.redirect('/');
 });
 
 //login page
