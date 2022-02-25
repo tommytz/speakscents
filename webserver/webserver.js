@@ -294,15 +294,17 @@ app.get("/shop", function (req, res) {
 
 // Shop item clicked
 app.post("/click", function (req, res) {
-  let client_click = req.body.click;
-  console.log(req.session.id + " received: " + client_click);
+  if (cookieAllowed) {
+    let client_click = req.body.click;
+    console.log(req.session.id + " received: " + client_click);
 
-  if (!req.session.shop_click.hasOwnProperty(client_click)) {
-    req.session.shop_click[client_click] = 0;
+    if (!req.session.shop_click.hasOwnProperty(client_click)) {
+      req.session.shop_click[client_click] = 0;
+    }
+    req.session.shop_click[client_click]++;
+    console.log(req.session);
+    req.session.save();
   }
-  req.session.shop_click[client_click]++;
-  console.log(req.session);
-  req.session.save();
 });
 
 //Accept Cookie
